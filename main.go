@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/RaymondCode/simple-demo/service"
 	"github.com/gin-gonic/gin"
+	"github.com/ikuraoo/fastdouyin/service"
 )
 
 func main() {
