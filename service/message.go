@@ -2,8 +2,8 @@ package service
 
 import (
 	"encoding/json"
+	"fastdouyin/controller"
 	"fmt"
-	"github.com/ikuraoo/fastdouyin/controller"
 	"io"
 	"net"
 	"sync"

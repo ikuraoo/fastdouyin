@@ -1,12 +1,16 @@
 package main
 
 import (
+	"fastdouyin/dao"
+	"fastdouyin/service"
+
 	"github.com/gin-gonic/gin"
-	"github.com/ikuraoo/fastdouyin/service"
 )
 
 func main() {
 	go service.RunMessageServer()
+
+	dao.InitMysql()
 
 	r := gin.Default()
 

@@ -11,6 +11,16 @@ var DemoVideos = []Video{
 		CommentCount:  0,
 		IsFavorite:    false,
 	},
+	{
+		Id:     2,
+		Author: DemoUser,
+		//PlayUrl: "https://www.w3schools.com/html/movie.mp4",
+		PlayUrl:       "http://192.168.1.6:8080/static/2_share_3920804c0bca39571ab032c9cd11984b.mp4",
+		CoverUrl:      "https://cdn.pixabay.com/photo/2016/03/27/18/10/bear-1283347_1280.jpg",
+		FavoriteCount: 0,
+		CommentCount:  0,
+		IsFavorite:    false,
+	},
 }
 
 var DemoComments = []Comment{

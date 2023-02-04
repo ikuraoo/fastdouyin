@@ -1,8 +1,9 @@
 package main
 
 import (
+	"fastdouyin/controller"
+
 	"github.com/gin-gonic/gin"
-	"github.com/ikuraoo/fastdouyin/controller"
 )
 
 func initRouter(r *gin.Engine) {
