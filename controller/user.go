@@ -1,8 +1,9 @@
 package controller
 
 import (
+	"fastdouyin/entity"
 	"net/http"
-	"sync/atomic"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,7 +22,7 @@ var usersLoginInfo = map[string]User{
 	},
 }
 
-var userIdSequence = int64(1)
+//var userIdSequence = int64(0)
 
 type UserLoginResponse struct {
 	Response
@@ -31,28 +32,37 @@ type UserLoginResponse struct {
 
 type UserResponse struct {
 	Response
-	User User `json:"user"`
+	User entity.User `json:"user"`
 }
 
 func Register(c *gin.Context) {
 
 	username := c.Query("username")
 	password := c.Query("password")
-	token := username + password
-	if _, exist := usersLoginInfo[token]; exist {
+	//token := username + password
+	//if _, exist := usersLoginInfo[token]; exist {
+	userdao := entity.NewUserDaoInstance()
+	if _, exist := userdao.FindByName(username); exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 1, StatusMsg: "User already exist"},
 		})
 	} else {
-		atomic.AddInt64(&userIdSequence, 1)
-		newUser := User{
-			Id:   userIdSequence,
-			Name: username,
+		//atomic.AddInt64(&userIdSequence, 1)
+		newUser := entity.User{
+			//Id:            userIdSequence,
+			Name:          username,
+			Password:      password,
+			FollowCount:   0,
+			FollowerCount: 0,
+			CreateTime:    time.Now(),
+			UpdateTime:    time.Now(),
+			IsDeleted:     false,
 		}
-		usersLoginInfo[token] = newUser
+		//usersLoginInfo[token] = newUser
+		userdao.CreateUser(&newUser)
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0},
-			UserId:   userIdSequence,
+			UserId:   newUser.Id,
 			Token:    username + password,
 		})
 	}
@@ -64,8 +74,8 @@ func Login(c *gin.Context) {
 	password := c.Query("password")
 
 	token := username + password
-
-	if user, exist := usersLoginInfo[token]; exist {
+	userdao := entity.NewUserDaoInstance()
+	if user, exist := userdao.FindByName(username); exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0},
 			UserId:   user.Id,
@@ -79,9 +89,9 @@ func Login(c *gin.Context) {
 }
 
 func UserInfo(c *gin.Context) {
-	token := c.Query("token")
-
-	if user, exist := usersLoginInfo[token]; exist {
+	username := c.Query("token")
+	userdao := entity.NewUserDaoInstance()
+	if user, exist := userdao.FindByName(username); exist {
 		c.JSON(http.StatusOK, UserResponse{
 			Response: Response{StatusCode: 0},
 			User:     user,

@@ -1,8 +1,6 @@
 package dao
 
 import (
-	"fastdouyin/controller"
-
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -15,6 +13,6 @@ func InitMysql() (err error) {
 	if err != nil {
 		panic(err)
 	}
-	Db.AutoMigrate(&controller.User{})
+	//Db.AutoMigrate(&controller.User{})
 	return
 }

@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"fastdouyin/dao"
 	"sync"
 	"time"
 )
@@ -31,5 +32,18 @@ func NewUserDaoInstance() *UserDao {
 }
 
 func (*UserDao) CreateUser(user *User) error {
+	result := dao.Db.Create(&user)
+	if result.Error != nil {
+		return result.Error
+	}
 	return nil
+}
+
+func (*UserDao) FindByName(name string) (User, bool) {
+	var user User
+	result := dao.Db.Where("name = ?", name).First(&user)
+	if result.RowsAffected != 0 {
+		return user, true
+	}
+	return user, false
 }

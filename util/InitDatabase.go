@@ -2,14 +2,16 @@ package util
 
 import (
 	"fmt"
+
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
+var Db *gorm.DB
 
 func InitDB() error {
+
 	host := viper.GetString("datasource.host")
 	port := viper.GetString("datasource.port")
 	database := viper.GetString("datasource.database")
@@ -24,7 +26,7 @@ func InitDB() error {
 		database,
 		charset)
 	var err error
-	db, err = gorm.Open(
+	Db, err = gorm.Open(
 		mysql.Open(dsn),
 		&gorm.Config{},
 	)
