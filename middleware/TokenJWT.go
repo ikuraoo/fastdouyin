@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
@@ -14,7 +13,7 @@ type Claims struct {
 var jwtKey = []byte("daitoue_secret_key")
 
 func CreateToken(id int64) (string, error) {
-	expirationTime := time.Now().Add(7 * 24 * time.Hour)
+	expirationTime := time.Now().Add(7 * 24 * time.Hour) //终止时间，7天后
 	claims := &Claims{
 		Id: id,
 		StandardClaims: jwt.StandardClaims{
@@ -25,11 +24,11 @@ func CreateToken(id int64) (string, error) {
 		},
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
 
 	if err != nil {
-		return "", errors.New("token 生成失败")
+		return "", err
 	}
 
 	return tokenString, err

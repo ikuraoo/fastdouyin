@@ -44,8 +44,19 @@ func (*UserDao) QueryById(id int64) (*User, error) {
 func (*UserDao) QueryByName(name string) (*User, error) {
 	var user User
 	err := db.Where("name = ?", name).Find(&user).Error
-	if err != nil || user.Id == constant.WRONG_ID {
-		return nil, errors.New("用户不存在")
+	if err != nil {
+		return nil, errors.New("查询出错")
+	}
+	if user.Id == constant.WRONG_ID {
+		return nil, errors.New(constant.USER_NOT_EXIT)
 	}
 	return &user, nil
+}
+
+func (*UserDao) CreateUser(user *User) error {
+	err := db.Create(user).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }

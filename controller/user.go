@@ -1,11 +1,12 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/ikuraoo/fastdouyin/constant"
 	"github.com/ikuraoo/fastdouyin/middleware"
 	"github.com/ikuraoo/fastdouyin/service"
 	"net/http"
-	"sync/atomic"
 )
 
 // usersLoginInfo use map to store user info, and key is username+password for demo
@@ -38,25 +39,49 @@ func Register(c *gin.Context) {
 	username := c.Query("username")
 	password := c.Query("password")
 
-	token := username + password
+	//token := username + password
 
-	if _, exist := usersLoginInfo[token]; exist {
+	id, err := service.UserRegister(username, password)
+	fmt.Println(id)
+	if err != nil {
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: 1, StatusMsg: "User already exist"},
+			Response: Response{StatusCode: constant.RESP_MISTAKE, StatusMsg: err.Error()},
 		})
-	} else {
-		atomic.AddInt64(&userIdSequence, 1)
-		newUser := User{
-			Id:   userIdSequence,
-			Name: username,
-		}
-		usersLoginInfo[token] = newUser
-		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: 0},
-			UserId:   userIdSequence,
-			Token:    username + password,
-		})
+		return
 	}
+
+	token, err := middleware.CreateToken(id)
+	if err != nil {
+		c.JSON(http.StatusOK, UserLoginResponse{
+			Response: Response{StatusCode: constant.RESP_MISTAKE, StatusMsg: err.Error()},
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, UserLoginResponse{
+		Response: Response{StatusCode: constant.RESP_SUCCESS},
+		UserId:   id,
+		Token:    token,
+	})
+	return
+	//
+	//if _, exist := usersLoginInfo[token]; exist {
+	//	c.JSON(http.StatusOK, UserLoginResponse{
+	//		Response: Response{StatusCode: constant.RESP_MISTAKE, StatusMsg: "User already exist"},
+	//	})
+	//} else {
+	//	atomic.AddInt64(&userIdSequence, 1)
+	//	newUser := User{
+	//		Id:   userIdSequence,
+	//		Name: username,
+	//	}
+	//	usersLoginInfo[token] = newUser
+	//	c.JSON(http.StatusOK, UserLoginResponse{
+	//		Response: Response{StatusCode: 0},
+	//		UserId:   userIdSequence,
+	//		Token:    username + password,
+	//	})
+	//}
 }
 
 func Login(c *gin.Context) {
@@ -67,7 +92,7 @@ func Login(c *gin.Context) {
 	//登录失败
 	if err != nil {
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: -1, StatusMsg: err.Error()},
+			Response: Response{StatusCode: constant.RESP_MISTAKE, StatusMsg: err.Error()},
 		})
 		return
 	}
@@ -75,7 +100,7 @@ func Login(c *gin.Context) {
 	token, err := middleware.CreateToken(id)
 	if err != nil {
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: -1, StatusMsg: err.Error()},
+			Response: Response{StatusCode: constant.RESP_MISTAKE, StatusMsg: err.Error()},
 		})
 		return
 	}
