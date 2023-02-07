@@ -13,8 +13,8 @@
 
  Date: 04/02/2023 21:44:53
 */
-DELETE FROM users
-alter table users auto_increment = 1
+DELETE FROM users;
+alter table users auto_increment = 1;
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -26,6 +26,7 @@ CREATE TABLE `users`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `password` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
+  `token` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `follow_count` bigint(20) NULL DEFAULT NULL,
   `follower_count` bigint(20) NULL DEFAULT NULL,
   `create_time` datetime(3) NULL DEFAULT NULL,

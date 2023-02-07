@@ -1,7 +1,7 @@
 package entity
 
 import (
-	"fastdouyin/dao"
+	"github.com/ikuraoo/fastdouyin/dao"
 	"sync"
 	"time"
 )
@@ -10,6 +10,7 @@ type User struct {
 	Id            int64 `gorm:"column:id"`
 	Name          string
 	Password      string
+	Token         string
 	FollowCount   int64
 	FollowerCount int64
 	CreateTime    time.Time
@@ -39,9 +40,9 @@ func (*UserDao) CreateUser(user *User) error {
 	return nil
 }
 
-func (*UserDao) FindByName(name string) (User, bool) {
+func (*UserDao) FindByToken(name string) (User, bool) {
 	var user User
-	result := dao.Db.Where("name = ?", name).First(&user)
+	result := dao.Db.Where("token = ?", name).First(&user)
 	if result.RowsAffected != 0 {
 		return user, true
 	}

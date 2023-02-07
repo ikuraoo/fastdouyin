@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"fastdouyin/entity"
+	"github.com/ikuraoo/fastdouyin/entity"
 	"net/http"
 	"time"
 
@@ -39,10 +39,10 @@ func Register(c *gin.Context) {
 
 	username := c.Query("username")
 	password := c.Query("password")
-	//token := username + password
+	token := username + password
 	//if _, exist := usersLoginInfo[token]; exist {
 	userdao := entity.NewUserDaoInstance()
-	if _, exist := userdao.FindByName(username); exist {
+	if _, exist := userdao.FindByToken(token); exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 1, StatusMsg: "User already exist"},
 		})
@@ -52,6 +52,7 @@ func Register(c *gin.Context) {
 			//Id:            userIdSequence,
 			Name:          username,
 			Password:      password,
+			Token:         token,
 			FollowCount:   0,
 			FollowerCount: 0,
 			CreateTime:    time.Now(),
@@ -63,7 +64,7 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0},
 			UserId:   newUser.Id,
-			Token:    username + password,
+			Token:    token,
 		})
 	}
 
@@ -75,7 +76,7 @@ func Login(c *gin.Context) {
 
 	token := username + password
 	userdao := entity.NewUserDaoInstance()
-	if user, exist := userdao.FindByName(username); exist {
+	if user, exist := userdao.FindByToken(token); exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0},
 			UserId:   user.Id,
@@ -89,9 +90,9 @@ func Login(c *gin.Context) {
 }
 
 func UserInfo(c *gin.Context) {
-	username := c.Query("token")
+	token := c.Query("token")
 	userdao := entity.NewUserDaoInstance()
-	if user, exist := userdao.FindByName(username); exist {
+	if user, exist := userdao.FindByToken(token); exist {
 		c.JSON(http.StatusOK, UserResponse{
 			Response: Response{StatusCode: 0},
 			User:     user,

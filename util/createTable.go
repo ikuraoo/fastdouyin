@@ -1,8 +1,8 @@
 package util
 
 import (
-	"fastdouyin/entity"
 	"fmt"
+	"github.com/ikuraoo/fastdouyin/entity"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

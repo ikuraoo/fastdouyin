@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fastdouyin/controller"
+	"github.com/ikuraoo/fastdouyin/controller"
 
 	"github.com/gin-gonic/gin"
 )

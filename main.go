@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fastdouyin/dao"
-	"fastdouyin/service"
+	"github.com/ikuraoo/fastdouyin/dao"
+	"github.com/ikuraoo/fastdouyin/service"
 
 	"github.com/gin-gonic/gin"
 )
