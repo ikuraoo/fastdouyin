@@ -2,11 +2,19 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/ikuraoo/fastdouyin/service"
+	"github.com/ikuraoo/fastdouyin/configure"
+	"github.com/ikuraoo/fastdouyin/entity"
 )
 
+//func main() {
+//	util.CreateTable()
+//}
+
 func main() {
-	go service.RunMessageServer()
+	configure.InitConfig()
+	entity.Init()
+	
+	//go service.RunMessageServer()
 
 	r := gin.Default()
 

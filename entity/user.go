@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"errors"
+	"github.com/ikuraoo/fastdouyin/constant"
 	"sync"
 	"time"
 )
@@ -30,6 +32,20 @@ func NewUserDaoInstance() *UserDao {
 	return userDao
 }
 
-func (*UserDao) CreateUser(user *User) error {
-	return nil
+func (*UserDao) QueryById(id int64) (*User, error) {
+	var user User
+	err := db.Where("id = ?", id).Find(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (*UserDao) QueryByName(name string) (*User, error) {
+	var user User
+	err := db.Where("name = ?", name).Find(&user).Error
+	if err != nil || user.Id == constant.WRONG_ID {
+		return nil, errors.New("用户不存在")
+	}
+	return &user, nil
 }

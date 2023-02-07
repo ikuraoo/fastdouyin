@@ -28,11 +28,7 @@ func CreateTable() {
 		return
 	}
 
-	err = db.AutoMigrate(&entity.User{},
-		&entity.Video{},
-		&entity.Comment{},
-		&entity.Follow{},
-		&entity.Favourite{})
+	err = db.AutoMigrate(&entity.Video{})
 	if err != nil {
 		fmt.Println("建表失败")
 	}
