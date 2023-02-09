@@ -3,10 +3,11 @@ package service
 import (
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/ikuraoo/fastdouyin/constant"
 	"github.com/ikuraoo/fastdouyin/entity"
 	"golang.org/x/crypto/bcrypt"
-	"time"
 )
 
 type UserLoginMessage struct {

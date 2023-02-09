@@ -2,11 +2,12 @@ package controller
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/ikuraoo/fastdouyin/constant"
 	"github.com/ikuraoo/fastdouyin/middleware"
 	"github.com/ikuraoo/fastdouyin/service"
-	"net/http"
 )
 
 // usersLoginInfo use map to store user info, and key is username+password for demo
@@ -127,7 +128,7 @@ func Login(c *gin.Context) {
 
 func UserInfo(c *gin.Context) {
 	token := c.Query("token")
-
+	fmt.Println(token)
 	if user, exist := usersLoginInfo[token]; exist {
 		c.JSON(http.StatusOK, UserResponse{
 			Response: Response{StatusCode: 0},
