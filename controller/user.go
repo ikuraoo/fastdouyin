@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/ikuraoo/fastdouyin/constant"
+	"github.com/ikuraoo/fastdouyin/entity"
 	"github.com/ikuraoo/fastdouyin/middleware"
 	"github.com/ikuraoo/fastdouyin/service"
 	"net/http"
@@ -32,7 +33,7 @@ type UserLoginResponse struct {
 
 type UserResponse struct {
 	Response
-	User User `json:"user"`
+	User entity.User `json:"user"`
 }
 
 func Register(c *gin.Context) {
@@ -127,15 +128,35 @@ func Login(c *gin.Context) {
 
 func UserInfo(c *gin.Context) {
 	token := c.Query("token")
-
-	if user, exist := usersLoginInfo[token]; exist {
-		c.JSON(http.StatusOK, UserResponse{
-			Response: Response{StatusCode: 0},
-			User:     user,
+	_, claims, err := middleware.ParseToken(token)
+	if err != nil {
+		c.JSON(http.StatusOK, UserLoginResponse{
+			Response: Response{StatusCode: constant.RESP_MISTAKE, StatusMsg: err.Error()},
 		})
-	} else {
-		c.JSON(http.StatusOK, UserResponse{
-			Response: Response{StatusCode: 1, StatusMsg: "User doesn't exist"},
-		})
+		return
 	}
+	user, err := service.UserInfo(claims)
+	if err != nil {
+		c.JSON(http.StatusOK, UserLoginResponse{
+			Response: Response{StatusCode: constant.RESP_MISTAKE, StatusMsg: err.Error()},
+		})
+		return
+	}
+	c.JSON(http.StatusOK, UserResponse{
+		Response: Response{StatusCode: 0},
+		User:     *user,
+	})
+	/*
+		if user, exist := usersLoginInfo[token]; exist {
+			c.JSON(http.StatusOK, UserResponse{
+				Response: Response{StatusCode: 0},
+				User:     user,
+			})
+		} else {
+			c.JSON(http.StatusOK, UserResponse{
+				Response: Response{StatusCode: 1, StatusMsg: "User doesn't exist"},
+			})
+		}
+
+	*/
 }
