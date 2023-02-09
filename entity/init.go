@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-var Db *gorm.DB
+var db *gorm.DB
 
 func Init() error {
 	err := InitDB()
@@ -37,7 +37,7 @@ func InitDB() error {
 	//dsn := "root:root@tcp(127.0.0.1:3306)/dousheng?charset=utf8mb4&parseTime=true"
 	fmt.Println(dsn)
 	var err error
-	Db, err = gorm.Open(
+	db, err = gorm.Open(
 		mysql.Open(dsn),
 		&gorm.Config{},
 	)
