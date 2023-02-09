@@ -2,8 +2,9 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func TokenParse() gin.HandlerFunc {
@@ -26,6 +27,7 @@ func TokenParse() gin.HandlerFunc {
 			context.Abort()
 			return
 		}
+		fmt.Println("claims.UserId")
 		fmt.Println(claims.UserId)
 		context.Set("my_uid", claims.UserId)
 	}

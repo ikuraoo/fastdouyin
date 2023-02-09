@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+
 	"github.com/ikuraoo/fastdouyin/entity"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -22,7 +23,7 @@ func CreateTable() {
 	//	database,
 	//	charset)
 
-	dsn := "root:root@tcp(127.0.0.1:3306)/dousheng?charset=utf8mb4&parseTime=true"
+	dsn := "root:root@tcp(127.0.0.1:3306)/db?charset=utf8mb4&parseTime=true"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return
