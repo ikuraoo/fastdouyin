@@ -1,7 +1,8 @@
 package entity
 
 import (
-	"github.com/ikuraoo/fastdouyin/dao"
+	"errors"
+	"github.com/ikuraoo/fastdouyin/constant"
 	"sync"
 	"time"
 )
@@ -31,28 +32,31 @@ func NewUserDaoInstance() *UserDao {
 	return userDao
 }
 
+func (*UserDao) QueryById(id int64) (*User, error) {
+	var user User
+	err := db.Where("id = ?", id).Find(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (*UserDao) QueryByName(name string) (*User, error) {
+	var user User
+	err := db.Where("name = ?", name).Find(&user).Error
+	if err != nil {
+		return nil, errors.New("查询出错")
+	}
+	if user.Id == constant.WRONG_ID {
+		return nil, errors.New(constant.USER_NOT_EXIT)
+	}
+	return &user, nil
+}
+
 func (*UserDao) CreateUser(user *User) error {
-	result := dao.Db.Create(&user)
-	if result.Error != nil {
-		return result.Error
+	err := db.Create(user).Error
+	if err != nil {
+		return err
 	}
 	return nil
-}
-
-func (*UserDao) FindByName(name string) (User, bool) {
-	var user User
-	result := dao.Db.Where("name = ?", name).First(&user)
-	if result.RowsAffected != 0 {
-		return user, true
-	}
-	return user, false
-}
-
-func (*UserDao) FindById(id int) (User, bool) {
-	var user User
-	result := dao.Db.First(&user, id)
-	if result.RowsAffected != 0 {
-		return user, true
-	}
-	return user, false
 }

@@ -1,4 +1,4 @@
-package util
+package entity
 
 import (
 	"fmt"
@@ -9,6 +9,15 @@ import (
 )
 
 var Db *gorm.DB
+
+func Init() error {
+	err := InitDB()
+	//print(db)
+	//var user User
+	//db.Find(&user, 2)
+	//fmt.Println(user)
+	return err
+}
 
 func InitDB() error {
 
@@ -25,6 +34,8 @@ func InitDB() error {
 		port,
 		database,
 		charset)
+	//dsn := "root:root@tcp(127.0.0.1:3306)/dousheng?charset=utf8mb4&parseTime=true"
+	fmt.Println(dsn)
 	var err error
 	Db, err = gorm.Open(
 		mysql.Open(dsn),

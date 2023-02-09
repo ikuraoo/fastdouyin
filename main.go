@@ -1,16 +1,20 @@
 package main
 
 import (
-	"github.com/ikuraoo/fastdouyin/dao"
-	"github.com/ikuraoo/fastdouyin/service"
-
 	"github.com/gin-gonic/gin"
+	"github.com/ikuraoo/fastdouyin/configure"
+	"github.com/ikuraoo/fastdouyin/entity"
 )
 
-func main() {
-	go service.RunMessageServer()
+//func main() {
+//	util.CreateTable()
+//}
 
-	dao.InitMysql()
+func main() {
+	configure.InitConfig()
+	entity.Init()
+	
+	//go service.RunMessageServer()
 
 	r := gin.Default()
 

@@ -3,11 +3,13 @@ module github.com/ikuraoo/fastdouyin
 go 1.17
 
 require (
+	github.com/RaymondCode/simple-demo v0.0.0-20230109111057-5031aee01508
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gavv/httpexpect/v2 v2.8.0
 	github.com/gin-gonic/gin v1.7.7
-	github.com/ikuraoo/fastdouyin v0.0.0-20230204135335-cde159796236
 	github.com/spf13/viper v1.15.0
 	github.com/stretchr/testify v1.8.1
+	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
 	gorm.io/driver/mysql v1.4.5
 	gorm.io/gorm v1.24.5
 )
@@ -57,7 +59,6 @@ require (
 	github.com/yalp/jsonpath v0.0.0-20180802001716-5cc68e5049a0 // indirect
 	github.com/yudai/gojsondiff v1.0.0 // indirect
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
-	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/net v0.4.0 // indirect
 	golang.org/x/sys v0.3.0 // indirect
 	golang.org/x/text v0.5.0 // indirect
