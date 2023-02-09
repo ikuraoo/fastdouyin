@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/ikuraoo/fastdouyin/constant"
-	"github.com/ikuraoo/fastdouyin/entity"
 	"github.com/ikuraoo/fastdouyin/middleware"
 	"github.com/ikuraoo/fastdouyin/service"
 	"net/http"
@@ -33,7 +32,7 @@ type UserLoginResponse struct {
 
 type UserResponse struct {
 	Response
-	User entity.User `json:"user"`
+	User
 }
 
 func Register(c *gin.Context) {
@@ -144,7 +143,13 @@ func UserInfo(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, UserResponse{
 		Response: Response{StatusCode: 0},
-		User:     *user,
+		User: User{
+			Id:            user.Id,
+			Name:          user.Name,
+			FollowCount:   user.FollowerCount,
+			FollowerCount: user.FollowerCount,
+			IsFollow:      user.IsDeleted, //待完成————————————————
+		},
 	})
 	/*
 		if user, exist := usersLoginInfo[token]; exist {

@@ -10,11 +10,11 @@ import (
 type User struct {
 	Id            int64 `gorm:"column:id"`
 	Name          string
-	Password      string
+	Password      string `json:"Password,omitempty"`
 	FollowCount   int64
 	FollowerCount int64
-	CreateTime    time.Time
-	UpdateTime    time.Time
+	CreateTime    time.Time `json:"CreateTime,omitempty"`
+	UpdateTime    time.Time `json:"UpdateTime,omitempty"`
 	IsDeleted     bool
 }
 
