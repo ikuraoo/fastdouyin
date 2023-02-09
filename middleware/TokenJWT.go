@@ -6,7 +6,7 @@ import (
 )
 
 type Claims struct {
-	Id int64
+	UserId int64
 	jwt.StandardClaims
 }
 
@@ -15,7 +15,7 @@ var jwtKey = []byte("daitoue_secret_key")
 func CreateToken(id int64) (string, error) {
 	expirationTime := time.Now().Add(7 * 24 * time.Hour) //终止时间，7天后
 	claims := &Claims{
-		Id: id,
+		UserId: id,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 			IssuedAt:  time.Now().Unix(),
