@@ -19,7 +19,7 @@ type FeedResponse struct {
 // Feed same demo video list for every request
 func Feed(c *gin.Context) {
 
-	uid := c.Query("uid")
+	uid := c.Query("my_uid")
 	fmt.Println(uid)
 	if uid == "" {
 		uid = "0"
