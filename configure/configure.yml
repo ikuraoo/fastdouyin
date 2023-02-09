@@ -8,3 +8,7 @@ datasource:
   username: root
   password: root
   charset: utf8mb4
+video:
+  videoPath: http://115.156.212.248:8080/static/
+  coverPath: https://
+  maxNum: 10

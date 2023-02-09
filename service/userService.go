@@ -3,11 +3,12 @@ package service
 import (
 	"errors"
 	"fmt"
-	"time"
-
 	"github.com/ikuraoo/fastdouyin/constant"
 	"github.com/ikuraoo/fastdouyin/entity"
+	"github.com/ikuraoo/fastdouyin/middleware"
 	"golang.org/x/crypto/bcrypt"
+	"strconv"
+	"time"
 )
 
 type UserLoginMessage struct {
@@ -109,4 +110,13 @@ func (u *UserRegisterMessage) register() (int64, error) {
 		return constant.MISTAKE, err
 	}
 	return user.Id, nil
+}
+
+func UserInfo(claims *middleware.Claims) (*entity.User, error) {
+	id, _ := strconv.Atoi(claims.Id)
+	user, err := entity.NewUserDaoInstance().QueryById(int64(id))
+	if err != nil {
+		return nil, errors.New("用户不存在")
+	}
+	return user, err
 }
