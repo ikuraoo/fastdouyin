@@ -9,21 +9,21 @@ import (
 )
 
 type AuthorUser struct {
-	Id            int64
-	Name          string
-	FollowCount   int64
-	FollowerCount int64
-	IsFollow      bool
+	Id            int64  `json:"id,omitempty"`
+	Name          string `json:"name,omitempty"`
+	FollowCount   int64  `json:"follow_count,omitempty"`
+	FollowerCount int64  `json:"follower_count,omitempty"`
+	IsFollow      bool   `json:"is_follow,omitempty"`
 }
 
 type VideoWithUser struct {
-	Id             int64
+	Id             int64 `json:"id,omitempty"`
 	Author         *AuthorUser
-	PlayUrl        string
-	CoverUrl       string
-	CommentCount   int64
-	FavouriteCount int64
-	Title          string
+	PlayUrl        string `json:"play_url" json:"play_url,omitempty"`
+	CoverUrl       string `json:"cover_url,omitempty"`
+	CommentCount   int64  `json:"comment_count,omitempty"`
+	FavouriteCount int64  `json:"favorite_count,omitempty"`
+	Title          string `json:"is_favorite,omitempty"`
 }
 
 func VideoFeed(myUId int64, LatestTime int64) ([]*VideoWithUser, error) {
