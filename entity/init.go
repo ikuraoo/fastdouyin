@@ -2,6 +2,7 @@ package entity
 
 import (
 	"fmt"
+
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -19,6 +20,7 @@ func Init() error {
 }
 
 func InitDB() error {
+
 	host := viper.GetString("datasource.host")
 	port := viper.GetString("datasource.port")
 	database := viper.GetString("datasource.database")

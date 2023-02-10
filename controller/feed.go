@@ -2,12 +2,13 @@ package controller
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/ikuraoo/fastdouyin/constant"
-	"github.com/ikuraoo/fastdouyin/service"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/ikuraoo/fastdouyin/constant"
+	"github.com/ikuraoo/fastdouyin/service"
 )
 
 type FeedResponse struct {
@@ -19,12 +20,15 @@ type FeedResponse struct {
 // Feed same demo video list for every request
 func Feed(c *gin.Context) {
 
-	uid := c.Query("uid")
+	uid, _ := c.Get("my_uid")
+	uidString := fmt.Sprintf("%v", uid)
+	fmt.Println("uid")
 	fmt.Println(uid)
 	if uid == "" {
 		uid = "0"
 	}
-	myUId, _ := strconv.ParseInt(uid, 10, 64)
+	myUId, _ := strconv.ParseInt(uidString, 10, 64)
+	fmt.Println(myUId)
 	videoFeed, err := service.VideoFeed(myUId, 1)
 	if err != nil {
 		c.JSON(http.StatusOK, FeedResponse{

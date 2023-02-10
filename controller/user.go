@@ -32,7 +32,7 @@ type UserLoginResponse struct {
 
 type UserResponse struct {
 	Response
-	User User `json:"user"`
+	User
 }
 
 func Register(c *gin.Context) {
@@ -127,15 +127,41 @@ func Login(c *gin.Context) {
 
 func UserInfo(c *gin.Context) {
 	token := c.Query("token")
-
-	if user, exist := usersLoginInfo[token]; exist {
-		c.JSON(http.StatusOK, UserResponse{
-			Response: Response{StatusCode: 0},
-			User:     user,
+	_, claims, err := middleware.ParseToken(token)
+	if err != nil {
+		c.JSON(http.StatusOK, UserLoginResponse{
+			Response: Response{StatusCode: constant.RESP_MISTAKE, StatusMsg: err.Error()},
 		})
-	} else {
-		c.JSON(http.StatusOK, UserResponse{
-			Response: Response{StatusCode: 1, StatusMsg: "User doesn't exist"},
-		})
+		return
 	}
+	user, err := service.UserInfo(claims)
+	if err != nil {
+		c.JSON(http.StatusOK, UserLoginResponse{
+			Response: Response{StatusCode: constant.RESP_MISTAKE, StatusMsg: err.Error()},
+		})
+		return
+	}
+	c.JSON(http.StatusOK, UserResponse{
+		Response: Response{StatusCode: 0},
+		User: User{
+			Id:            user.Id,
+			Name:          user.Name,
+			FollowCount:   user.FollowerCount,
+			FollowerCount: user.FollowerCount,
+			IsFollow:      user.IsDeleted, //待完成————————————————
+		},
+	})
+	/*
+		if user, exist := usersLoginInfo[token]; exist {
+			c.JSON(http.StatusOK, UserResponse{
+				Response: Response{StatusCode: 0},
+				User:     user,
+			})
+		} else {
+			c.JSON(http.StatusOK, UserResponse{
+				Response: Response{StatusCode: 1, StatusMsg: "User doesn't exist"},
+			})
+		}
+
+	*/
 }

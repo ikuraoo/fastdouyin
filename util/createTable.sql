@@ -13,7 +13,8 @@
 
  Date: 04/02/2023 21:44:53
 */
-
+#DELETE FROM users;
+#alter table users auto_increment = 1;
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
