@@ -19,8 +19,8 @@ type AuthorUser struct {
 type VideoWithUser struct {
 	Id             int64
 	Author         *AuthorUser
-	PlayUrl        string
-	CoverUrl       string
+	PlayUrl        string `json:"play_url" json:"play_url,omitempty"`
+	CoverUrl       string `json:"cover_url,omitempty"`
 	CommentCount   int64
 	FavouriteCount int64
 	Title          string
