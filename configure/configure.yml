@@ -4,11 +4,11 @@ datasource:
   driverName: mysql
   host: 127.0.0.1
   port: 3306
-  database: db
+  database: dousheng
   username: root
   password: root
   charset: utf8mb4
 video:
-  videoPath: http://10.21.43.245:8080/static/
+  videoPath: http://115.156.212.248:8080/static/
   coverPath: https://
   maxNum: 10
