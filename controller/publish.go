@@ -3,13 +3,14 @@ package controller
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/ikuraoo/fastdouyin/service"
 	"net/http"
 	"path/filepath"
 )
 
 type VideoListResponse struct {
 	Response
-	VideoList []Video `json:"video_list"`
+	VideoList []*service.VideoWithUser `json:"video_list"`
 }
 
 // Publish check token then save upload file to public directory
@@ -50,10 +51,20 @@ func Publish(c *gin.Context) {
 
 // PublishList all users have same publish video list
 func PublishList(c *gin.Context) {
+	uid, exist := c.Get("my_uid")
+	if !exist {
+		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+		return
+	}
+	videoFeed, err := service.PublishList(uid.(int64))
+	if err != nil {
+		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+		return
+	}
 	c.JSON(http.StatusOK, VideoListResponse{
 		Response: Response{
 			StatusCode: 0,
 		},
-		VideoList: DemoVideos,
+		VideoList: videoFeed,
 	})
 }

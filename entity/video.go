@@ -40,3 +40,12 @@ func (*VideoDao) QueryVideos(maxNum int64) (*[]Video, error) {
 	}
 	return &videos, nil
 }
+
+func (*VideoDao) QueryByAuther(uid int64) (*[]Video, error) {
+	var videos []Video
+	err := db.Where("uid == ?", "uid").Find(&videos).Error
+	if err != nil {
+		return nil, err
+	}
+	return &videos, nil
+}

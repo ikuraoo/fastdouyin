@@ -84,3 +84,12 @@ func CombinationVideosAndUsers(myUId int64, videos *[]entity.Video) ([]*VideoWit
 	}
 	return videosWithUsers, nil
 }
+
+func PublishList(uid int64) ([]*VideoWithUser, error) {
+	videos, err := entity.NewVideoDaoInstance().QueryByAuther(uid)
+	if err != nil {
+		return nil, err
+	}
+	videosWithUsers, err := CombinationVideosAndUsers(uid, videos)
+	return videosWithUsers, nil
+}
