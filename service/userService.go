@@ -7,6 +7,7 @@ import (
 	"github.com/ikuraoo/fastdouyin/entity"
 	"github.com/ikuraoo/fastdouyin/middleware"
 	"golang.org/x/crypto/bcrypt"
+	"strconv"
 	"time"
 )
 
@@ -112,8 +113,8 @@ func (u *UserRegisterMessage) register() (int64, error) {
 }
 
 func UserInfo(claims *middleware.Claims) (*entity.User, error) {
-	id := claims.Id
-	user, err := entity.NewUserDaoInstance().QueryById(id)
+	id, _ := strconv.Atoi(claims.Id)
+	user, err := entity.NewUserDaoInstance().QueryById(int64(id))
 	if err != nil {
 		return nil, errors.New("用户不存在")
 	}

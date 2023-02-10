@@ -62,7 +62,7 @@ CREATE TABLE `videos`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `follows`;
 CREATE TABLE `follows`  (
-  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `my_uid` bigint(20) NULL DEFAULT NULL,
   `his_uid` bigint(20) NULL DEFAULT NULL,
   `is_follow` tinyint(1) NULL DEFAULT NULL,

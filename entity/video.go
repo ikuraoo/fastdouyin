@@ -1,6 +1,9 @@
 package entity
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 type Video struct {
 	Id             int64     `gorm:"column:id"`
@@ -13,4 +16,27 @@ type Video struct {
 	CreateTime     time.Time `gorm:"column:create_time"`
 	UpdateTime     time.Time `gorm:"column:update_time"`
 	IsDeleted      bool      `gorm:"column:is_deleted"`
+}
+
+type VideoDao struct {
+}
+
+var videoDao *VideoDao
+var videoOnce sync.Once
+
+func NewVideoDaoInstance() *VideoDao {
+	videoOnce.Do(
+		func() {
+			videoDao = &VideoDao{}
+		})
+	return videoDao
+}
+
+func (*VideoDao) QueryVideos(maxNum int64) (*[]Video, error) {
+	var videos []Video
+	err := db.Limit(int(maxNum)).Find(&videos).Error
+	if err != nil {
+		return nil, err
+	}
+	return &videos, nil
 }

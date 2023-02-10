@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/ikuraoo/fastdouyin/controller"
-
 	"github.com/gin-gonic/gin"
+	"github.com/ikuraoo/fastdouyin/controller"
+	"github.com/ikuraoo/fastdouyin/middleware"
 )
 
 func initRouter(r *gin.Engine) {
@@ -13,7 +13,7 @@ func initRouter(r *gin.Engine) {
 	apiRouter := r.Group("/douyin")
 
 	// basic apis
-	apiRouter.GET("/feed/", controller.Feed)
+	apiRouter.GET("/feed/", middleware.TokenParse(), controller.Feed)
 	apiRouter.GET("/user/", controller.UserInfo)
 	apiRouter.POST("/user/register/", controller.Register)
 	apiRouter.POST("/user/login/", controller.Login)
