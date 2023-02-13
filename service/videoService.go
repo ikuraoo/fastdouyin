@@ -6,6 +6,7 @@ import (
 	"github.com/ikuraoo/fastdouyin/entity"
 	"github.com/spf13/viper"
 	"strconv"
+	"time"
 )
 
 type AuthorUser struct {
@@ -83,6 +84,27 @@ func CombinationVideosAndUsers(myUId int64, videos *[]entity.Video) ([]*VideoWit
 		videosWithUsers = append(videosWithUsers, &videoWithUser)
 	}
 	return videosWithUsers, nil
+}
+
+func VideoPublish(uid int64, title, filename string) error {
+
+	video := &entity.Video{
+		//Id:             0,
+		UId:            uid,
+		PlayUrl:        filename,
+		CoverUrl:       "https://cdn.pixabay.com/photo/2016/03/27/18/10/bear-1283347_1280.jpg",
+		CommentCount:   0,
+		FavouriteCount: 0,
+		Title:          title,
+		CreateTime:     time.Now(),
+		UpdateTime:     time.Now(),
+		IsDeleted:      false,
+	}
+	err := entity.NewVideoDaoInstance().CreateVideo(video)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func PublishList(uid int64) ([]*VideoWithUser, error) {

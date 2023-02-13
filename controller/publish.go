@@ -3,6 +3,8 @@ package controller
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/ikuraoo/fastdouyin/constant"
+	"github.com/ikuraoo/fastdouyin/middleware"
 	"github.com/ikuraoo/fastdouyin/service"
 	"net/http"
 	"path/filepath"
@@ -15,10 +17,28 @@ type VideoListResponse struct {
 
 // Publish check token then save upload file to public directory
 func Publish(c *gin.Context) {
-	token := c.PostForm("token")
+	/*
+		token := c.PostForm("token")
 
-	if _, exist := usersLoginInfo[token]; !exist {
-		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+		if _, exist := usersLoginInfo[token]; !exist {
+			c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+			return
+		}
+
+	*/
+	//uid, exist := c.Get("my_uid")
+	///fmt.Println(uid)
+	//if !exist {
+	//	c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+	//		return
+	//}
+	token := c.PostForm("token")
+	fmt.Println(token)
+	_, claims, err := middleware.ParseToken(token)
+	if err != nil {
+		c.JSON(http.StatusOK, UserLoginResponse{
+			Response: Response{StatusCode: constant.RESP_MISTAKE, StatusMsg: err.Error()},
+		})
 		return
 	}
 
@@ -32,8 +52,8 @@ func Publish(c *gin.Context) {
 	}
 
 	filename := filepath.Base(data.Filename)
-	user := usersLoginInfo[token]
-	finalName := fmt.Sprintf("%d_%s", user.Id, filename)
+	//user := usersLoginInfo[token]
+	finalName := fmt.Sprintf("%d_%s", claims.UserId, filename)
 	saveFile := filepath.Join("./public/", finalName)
 	if err := c.SaveUploadedFile(data, saveFile); err != nil {
 		c.JSON(http.StatusOK, Response{
@@ -42,16 +62,20 @@ func Publish(c *gin.Context) {
 		})
 		return
 	}
+	title := c.PostForm("title")
 
+	service.VideoPublish(claims.UserId, title, finalName)
 	c.JSON(http.StatusOK, Response{
 		StatusCode: 0,
 		StatusMsg:  finalName + " uploaded successfully",
 	})
+
 }
 
 // PublishList all users have same publish video list
 func PublishList(c *gin.Context) {
 	uid, exist := c.Get("my_uid")
+
 	if !exist {
 		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 		return
