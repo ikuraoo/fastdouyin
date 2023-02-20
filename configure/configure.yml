@@ -9,6 +9,9 @@ datasource:
   password: root
   charset: utf8mb4
 video:
-  videoPath: http://115.156.212.248:8080/static/
-  coverPath: /
+  videoPath: http://115.156.212.248:8080/static/videos/
+  coverPath: http://115.156.212.248:8080/static/covers/
   maxNum: 10
+path:
+  ffmpeg_path: "D:\\Program Files (x86)\\ffmpeg-master-latest-win64-gpl-shared\\bin\\ffmpeg.exe"
+  static_source_path: "D:\\Users\\DELL\\Desktop\\GolandCodes\\fastdouyin\\static"

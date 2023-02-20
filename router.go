@@ -13,24 +13,22 @@ func initRouter(r *gin.Engine) {
 	apiRouter := r.Group("/douyin")
 
 	// basic apis
-	apiRouter.GET("/feed/", middleware.TokenParse(), controller.Feed)
-	apiRouter.GET("/user/", controller.UserInfo)
+	apiRouter.GET("/feed/", controller.Feed)
+	apiRouter.GET("/user/", middleware.TokenParse(), controller.UserInfo)
 	apiRouter.POST("/user/register/", controller.Register)
 	apiRouter.POST("/user/login/", controller.Login)
-	apiRouter.POST("/publish/action/", controller.Publish)
+	apiRouter.POST("/publish/action/", middleware.TokenParse(), controller.Publish)
 	apiRouter.GET("/publish/list/", middleware.TokenParse(), controller.PublishList)
 
 	// extra apis - I
-	apiRouter.POST("/favorite/action/", controller.FavoriteAction)
+	apiRouter.POST("/favorite/action/", middleware.TokenParse(), controller.FavoriteAction)
 	apiRouter.GET("/favorite/list/", controller.FavoriteList)
-	apiRouter.POST("/comment/action/", controller.CommentAction)
-	apiRouter.GET("/comment/list/", controller.CommentList)
+	apiRouter.POST("/comment/action/", middleware.TokenParse(), controller.CommentAction)
+	apiRouter.GET("/comment/list/", middleware.TokenParse(), controller.CommentList)
 
 	// extra apis - II
-	apiRouter.POST("/relation/action/", controller.RelationAction)
-	apiRouter.GET("/relation/follow/list/", controller.FollowList)
-	apiRouter.GET("/relation/follower/list/", controller.FollowerList)
+	apiRouter.POST("/relation/action/", middleware.TokenParse(), controller.RelationAction)
+	apiRouter.GET("/relation/follow/list/", middleware.TokenParse(), controller.FollowList)
+	apiRouter.GET("/relation/follower/list/", middleware.TokenParse(), controller.FollowerList)
 	apiRouter.GET("/relation/friend/list/", controller.FriendList)
-	apiRouter.GET("/message/chat/", controller.MessageChat)
-	apiRouter.POST("/message/action/", controller.MessageAction)
 }

@@ -1,98 +1,69 @@
 package service
 
 import (
-	"fmt"
-	"github.com/ikuraoo/fastdouyin/constant"
+	"github.com/ikuraoo/fastdouyin/common"
 	"github.com/ikuraoo/fastdouyin/entity"
 	"github.com/spf13/viper"
 	"strconv"
 	"time"
 )
 
-type AuthorUser struct {
-	Id            int64
-	Name          string
-	FollowCount   int64
-	FollowerCount int64
-	IsFollow      bool
-}
-
-type VideoWithUser struct {
-	Id             int64
-	Author         *AuthorUser
-	PlayUrl        string `json:"play_url" json:"play_url,omitempty"`
-	CoverUrl       string `json:"cover_url,omitempty"`
-	CommentCount   int64
-	FavouriteCount int64
-	Title          string
-}
-
-func VideoFeed(myUId int64, LatestTime int64) ([]*VideoWithUser, error) {
+func VideoFeed(userId int64, latestTime time.Time) ([]*common.VideoMessage, error) {
 	MaxNum := viper.GetString("video.maxNum")
 	maxNum, err := strconv.ParseInt(MaxNum, 10, 64)
 	if err != nil {
 		return nil, err
 	}
 
-	videos, err := GetVideos(maxNum)
-	videosWithUsers, err := CombinationVideosAndUsers(myUId, videos)
+	videos, err := GetVideos(maxNum, latestTime)
+	videosWithUsers, err := CombinationVideosAndUsers(userId, videos)
 	return videosWithUsers, err
 }
 
-func GetVideos(maxNum int64) (*[]entity.Video, error) {
-	videos, err := entity.NewVideoDaoInstance().QueryVideos(maxNum)
+func GetVideos(maxNum int64, latestTime time.Time) (*[]entity.Video, error) {
+	videos, err := entity.NewVideoDaoInstance().QueryVideos(maxNum, latestTime)
 	if err != nil {
 		return nil, err
 	}
 	return videos, nil
 }
 
-func CombinationVideosAndUsers(myUId int64, videos *[]entity.Video) ([]*VideoWithUser, error) {
+func CombinationVideosAndUsers(UserId int64, videos *[]entity.Video) ([]*common.VideoMessage, error) {
 	videoPath := viper.GetString("video.videoPath")
 	coverPath := viper.GetString("video.coverPath")
 	var video entity.Video
 	var author *entity.User
 	var err error
-	var videosWithUsers = make([]*VideoWithUser, 0)
-	var isFollow bool
+	var videosWithUsers = make([]*common.VideoMessage, 0)
 	for _, video = range *videos {
 		author, err = entity.NewUserDaoInstance().QueryById(video.UId)
 		if err != nil {
 			continue
 		}
-		if myUId != constant.WRONG_ID {
-			isFollow, err = entity.NewFollowDaoInstance().QueryIsFollow(myUId, author.Id)
-			if err != nil {
-				fmt.Println(err)
-			}
+		isfavorite, _ := entity.NewFavoriteDaoInstance().GetVideoFavorState(UserId, video.Id)
+		authorMessage, _ := ConvertToUserMessage(author, UserId)
+		videoMessage := common.VideoMessage{
+			Id:            video.Id,
+			Author:        *authorMessage,
+			PlayUrl:       videoPath + video.PlayUrl,
+			CoverUrl:      coverPath + video.CoverUrl,
+			CommentCount:  video.CommentCount,
+			FavoriteCount: video.FavouriteCount,
+			IsFavorite:    isfavorite,
+			Title:         video.Title,
 		}
-		videoWithUser := VideoWithUser{
-			Id: video.Id,
-			Author: &AuthorUser{
-				Id:            author.Id,
-				Name:          author.Name,
-				FollowCount:   author.FollowCount,
-				FollowerCount: author.FollowerCount,
-				IsFollow:      isFollow,
-			},
-			PlayUrl:        videoPath + video.PlayUrl,
-			CoverUrl:       coverPath + video.CoverUrl,
-			CommentCount:   video.CommentCount,
-			FavouriteCount: video.FavouriteCount,
-			Title:          video.Title,
-		}
-		videosWithUsers = append(videosWithUsers, &videoWithUser)
+		videosWithUsers = append(videosWithUsers, &videoMessage)
 	}
 	return videosWithUsers, nil
 }
 
-func VideoPublish(uid int64, title, filename string) error {
+func VideoPublish(uid int64, title, filename, covername string) error {
 
 	video := &entity.Video{
 		//Id:             0,
 		UId:            uid,
 		PlayUrl:        filename,
-		CoverUrl:       "https://cdn.pixabay.com/photo/2016/03/27/18/10/bear-1283347_1280.jpg",
+		CoverUrl:       covername,
 		CommentCount:   0,
 		FavouriteCount: 0,
 		Title:          title,
@@ -100,18 +71,31 @@ func VideoPublish(uid int64, title, filename string) error {
 		UpdateTime:     time.Now(),
 		IsDeleted:      false,
 	}
-	err := entity.NewVideoDaoInstance().CreateVideo(video)
+	err := entity.NewVideoDaoInstance().CreateVideo(video, uid)
+
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func PublishList(uid int64) ([]*VideoWithUser, error) {
-	videos, err := entity.NewVideoDaoInstance().QueryByAuther(uid)
+func PublishList(userId int64) ([]*common.VideoMessage, error) {
+	//检查用户是否存在
+	_, err := entity.NewUserDaoInstance().QueryById(userId)
 	if err != nil {
 		return nil, err
 	}
-	videosWithUsers, err := CombinationVideosAndUsers(uid, videos)
+
+	//查询用户发布视频
+	videos, err := entity.NewVideoDaoInstance().QueryByAuther(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	//将视频与用户信息连接，转为可输出格式
+	videosWithUsers, err := CombinationVideosAndUsers(userId, videos)
+	if err != nil {
+		return nil, err
+	}
 	return videosWithUsers, nil
 }

@@ -28,9 +28,13 @@ CREATE TABLE `users`  (
   `password` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `follow_count` bigint(20) NULL DEFAULT NULL,
   `follower_count` bigint(20) NULL DEFAULT NULL,
+  `total_favorited` bigint(20) NULL DEFAULT NULL,
+  `work_count` bigint(20) NULL DEFAULT NULL,
+  `favorite_count` bigint(20) NULL DEFAULT NULL,
   `create_time` datetime(3) NULL DEFAULT NULL,
   `update_time` datetime(3) NULL DEFAULT NULL,
   `is_deleted` tinyint(1) NULL DEFAULT NULL,
+
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 

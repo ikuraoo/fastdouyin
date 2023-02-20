@@ -8,6 +8,9 @@ import (
 func TokenParse() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		tokenStr := context.Query("token")
+		if tokenStr == "" {
+			tokenStr = context.PostForm("token")
+		}
 
 		if tokenStr == "" {
 			context.JSON(http.StatusUnauthorized, gin.H{
@@ -27,6 +30,6 @@ func TokenParse() gin.HandlerFunc {
 			return
 		}
 
-		context.Set("my_uid", claims.UserId)
+		context.Set("userId", claims.UserId)
 	}
 }
