@@ -33,7 +33,7 @@ func (u *UserLoginMessage) Do() (int64, error) {
 }
 
 func (u *UserLoginMessage) check() error {
-	//实现参数的检查、防止sql注入
+	//登录不需要检查
 	return nil
 }
 
@@ -65,9 +65,11 @@ func UserRegister(username string, password string) (int64, error) {
 }
 
 func (u *UserRegisterMessage) Do() (int64, error) {
+	//检查参数
 	if err := u.check(); err != nil {
-		return common.WRONG_ID, errors.New("请检查输入")
+		return common.WRONG_ID, err
 	}
+
 	id, err := u.register()
 	if err != nil {
 		return common.MISTAKE, err
@@ -76,7 +78,10 @@ func (u *UserRegisterMessage) Do() (int64, error) {
 }
 
 func (u *UserRegisterMessage) check() error {
-	//实现参数的检查、防止sql注入
+	exist := entity.NewUserDaoInstance().IsUserExistByName(u.name)
+	if exist {
+		return errors.New("用户已存在")
+	}
 	return nil
 }
 
@@ -84,10 +89,6 @@ func (u *UserRegisterMessage) register() (int64, error) {
 	password, err := bcrypt.GenerateFromPassword([]byte(u.password), bcrypt.DefaultCost)
 	if err != nil {
 		return common.MISTAKE, errors.New("密码加密出错")
-	}
-	_, err = entity.NewUserDaoInstance().QueryByName(u.name)
-	if err == nil {
-		return common.WRONG_ID, errors.New("用户已存在")
 	}
 
 	user := &entity.User{
@@ -110,37 +111,47 @@ func (u *UserRegisterMessage) register() (int64, error) {
 	return user.Id, nil
 }
 
-func UserInfo(userId int64) (*common.UserMessage, error) {
-
-	user, err := entity.NewUserDaoInstance().QueryById(userId)
-	if err != nil {
-		return nil, errors.New("用户不存在")
+func UserInfo(userId, targetId int64) (*common.UserResponse, error) {
+	//检查参数
+	exist := entity.NewUserDaoInstance().IsUserExistById(userId)
+	if !exist {
+		return nil, errors.New(common.USER_NOT_EXIT)
 	}
-	userMessage, _ := ConvertToUserMessage(user, 0)
-	return userMessage, err
+	user, err := entity.NewUserDaoInstance().QueryById(targetId)
+	if err != nil || user.Id == 0 {
+		return nil, errors.New(common.USER_NOT_EXIT)
+	}
+
+	//转为输出格式
+	userResponse, err := ConvertToUserResponse(user, userId)
+	if err != nil {
+		return nil, errors.New("格式转换失败")
+	}
+	return userResponse, err
 }
 
-func ConvertToUserMessage(author *entity.User, userId int64) (*common.UserMessage, error) {
+func ConvertToUserResponse(author *entity.User, userId int64) (*common.UserResponse, error) {
 	var isfollow bool
-	var err error
 	if userId == 0 {
 		isfollow = false
+	} else if userId == author.Id {
+		isfollow = true
 	} else {
-		isfollow, err = entity.NewFollowDaoInstance().QueryIsFollow(author.Id, userId)
-		if err != nil {
-			return nil, err
-		}
+		isfollow, _ = entity.NewFollowDaoInstance().QueryIsFollow(userId, author.Id)
 	}
 
-	userMessage := common.UserMessage{
-		Id:             author.Id,
-		Name:           author.Name,
-		FollowCount:    author.FollowCount,
-		FollowerCount:  author.FollowerCount,
-		IsFollow:       isfollow,
-		TotalFavorited: author.TotalFavorited,
-		WorkCount:      author.WorkCount,
-		FavoriteCount:  author.FavoriteCount,
+	userResponse := common.UserResponse{
+		Id:              author.Id,
+		Name:            author.Name,
+		FollowCount:     author.FollowCount,
+		FollowerCount:   author.FollowerCount,
+		IsFollow:        isfollow,
+		Avatar:          author.Avatar,
+		BackgroundImage: author.BackgroundImage,
+		Signature:       author.Signature,
+		TotalFavorited:  author.TotalFavorited,
+		WorkCount:       author.WorkCount,
+		FavoriteCount:   author.FavoriteCount,
 	}
-	return &userMessage, nil
+	return &userResponse, nil
 }

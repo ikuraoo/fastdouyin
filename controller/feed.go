@@ -13,34 +13,35 @@ import (
 
 type FeedResponse struct {
 	common.Response
-	VideoList []*common.VideoMessage `json:"video_list,omitempty"`
-	NextTime  int64                  `json:"next_time,omitempty"`
+	VideoList []*common.VideoResponse `json:"video_list,omitempty"`
+	NextTime  int64                   `json:"next_time,omitempty"`
 }
 
 // Feed same demo video list for every request
 func Feed(c *gin.Context) {
 	var latestTime time.Time
-
 	rawTimestamp, ok := c.GetQuery("latest_time")
-	if ok {
-		intTime, _ := strconv.ParseInt(rawTimestamp, 10, 64)
-		latestTime = time.Unix(intTime, 0)
-	} else {
+	if !ok || rawTimestamp == "" {
 		latestTime = time.Now()
+	} else {
+		intTime, _ := strconv.ParseInt(rawTimestamp, 10, 64)
+		latestTime = time.Unix(0, intTime*1e6)
 	}
 
 	token, ok := c.GetQuery("token")
-	var videoList []*common.VideoMessage
+	var videoList []*common.VideoResponse
 	var err error
-	if !ok {
+	if !ok || token == "" {
 		videoList, err = DoNoToken(latestTime)
 		if err != nil {
 			common.SendError(c, err.Error())
+			return
 		}
 	} else {
 		videoList, err = DoHasToken(token, latestTime)
 		if err != nil {
 			common.SendError(c, err.Error())
+			return
 		}
 	}
 
@@ -52,7 +53,7 @@ func Feed(c *gin.Context) {
 
 }
 
-func DoNoToken(latestTime time.Time) ([]*common.VideoMessage, error) {
+func DoNoToken(latestTime time.Time) ([]*common.VideoResponse, error) {
 	videoList, err := service.VideoFeed(0, latestTime)
 	if err != nil {
 		return nil, err
@@ -60,7 +61,7 @@ func DoNoToken(latestTime time.Time) ([]*common.VideoMessage, error) {
 	return videoList, nil
 }
 
-func DoHasToken(token string, latestTime time.Time) ([]*common.VideoMessage, error) {
+func DoHasToken(token string, latestTime time.Time) ([]*common.VideoResponse, error) {
 	//解析成功
 	if _, claim, ok := middleware.ParseToken(token); ok == nil {
 		//token超时

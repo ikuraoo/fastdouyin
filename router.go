@@ -22,7 +22,7 @@ func initRouter(r *gin.Engine) {
 
 	// extra apis - I
 	apiRouter.POST("/favorite/action/", middleware.TokenParse(), controller.FavoriteAction)
-	apiRouter.GET("/favorite/list/", controller.FavoriteList)
+	apiRouter.GET("/favorite/list/", middleware.TokenParse(), controller.FavoriteList)
 	apiRouter.POST("/comment/action/", middleware.TokenParse(), controller.CommentAction)
 	apiRouter.GET("/comment/list/", middleware.TokenParse(), controller.CommentList)
 
@@ -30,5 +30,5 @@ func initRouter(r *gin.Engine) {
 	apiRouter.POST("/relation/action/", middleware.TokenParse(), controller.RelationAction)
 	apiRouter.GET("/relation/follow/list/", middleware.TokenParse(), controller.FollowList)
 	apiRouter.GET("/relation/follower/list/", middleware.TokenParse(), controller.FollowerList)
-	apiRouter.GET("/relation/friend/list/", controller.FriendList)
+
 }

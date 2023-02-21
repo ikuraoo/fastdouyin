@@ -45,9 +45,9 @@ func (*FavoriteDao) DeleteFavouriteByUidVid(uid, vid int64) error {
 }
 
 func (*FavoriteDao) GetVideoFavorState(uid, vid int64) (bool, error) {
-	err := db.Where("uid = ? and vid = ?", uid, vid).First(Favourite{}).Error
+	err := db.Where("uid = ? and vid = ?", uid, vid).First(&Favourite{}).Error
 	if err != nil {
 		return false, err
 	}
-	return true, nil
+	return true, err
 }

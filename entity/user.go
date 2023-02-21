@@ -3,22 +3,26 @@ package entity
 import (
 	"errors"
 	"github.com/ikuraoo/fastdouyin/common"
+	"log"
 	"sync"
 	"time"
 )
 
 type User struct {
-	Id             int64 `gorm:"column:id"`
-	Name           string
-	Password       string `json:"Password,omitempty"`
-	FollowCount    int64
-	FollowerCount  int64
-	TotalFavorited int64
-	WorkCount      int64
-	FavoriteCount  int64
-	CreateTime     time.Time `json:"CreateTime,omitempty"`
-	UpdateTime     time.Time `json:"UpdateTime,omitempty"`
-	IsDeleted      bool
+	Id              int64 `gorm:"column:id"`
+	Name            string
+	Password        string `json:"Password,omitempty"`
+	FollowCount     int64
+	FollowerCount   int64
+	TotalFavorited  int64
+	WorkCount       int64
+	Avatar          string `json:"avatar,omitempty"`
+	BackgroundImage string `json:"background_image,omitempty"`
+	Signature       string `json:"signature,omitempty"`
+	FavoriteCount   int64
+	CreateTime      time.Time `json:"CreateTime,omitempty"`
+	UpdateTime      time.Time `json:"UpdateTime,omitempty"`
+	IsDeleted       bool
 }
 
 type UserDao struct {
@@ -37,13 +41,34 @@ func NewUserDaoInstance() *UserDao {
 
 func (*UserDao) QueryById(id int64) (*User, error) {
 	var user User
-	err := db.Where("id = ?", id).Find(&user).Error
+	err := db.Where("id = ?", id).First(&user).Error
 	if err != nil {
-		return nil, err
+		return nil, errors.New(common.USER_NOT_EXIT)
 	}
 	return &user, nil
 }
-
+func (*UserDao) IsUserExistById(id int64) bool {
+	var user User
+	err := db.Where("id = ?", id).First(&user).Error
+	if err != nil {
+		log.Println(err)
+	}
+	if user.Id == 0 {
+		return false
+	}
+	return true
+}
+func (*UserDao) IsUserExistByName(name string) bool {
+	var user User
+	err := db.Where("name = ?", name).First(&user).Error
+	if err != nil {
+		log.Println(err)
+	}
+	if user.Id == 0 {
+		return false
+	}
+	return true
+}
 func (*UserDao) QueryByName(name string) (*User, error) {
 	var user User
 	err := db.Where("name = ?", name).Find(&user).Error

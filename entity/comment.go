@@ -3,6 +3,7 @@ package entity
 import (
 	"errors"
 	"gorm.io/gorm"
+	"log"
 	"sync"
 	"time"
 )
@@ -31,11 +32,25 @@ func NewCommentDaoInstance() *CommentDao {
 	return commentDao
 }
 
-func (c *CommentDao) QueryCommentById(commentId int64, comment *Comment) error {
-	if comment == nil {
-		return errors.New("QueryCommentById comment 空指针")
+func (c *CommentDao) QueryCommentById(commentId int64) (*Comment, error) {
+	var comment Comment
+	err := db.Where("id = ?", commentId).First(&comment).Error
+	if err != nil {
+		return nil, err
 	}
-	return db.Where("id = ?", commentId).First(comment).Error
+	return &comment, nil
+}
+
+func (c *CommentDao) IsCommenExistById(id int64) bool {
+	var comment Comment
+	err := db.Where("id = ?", id).First(&comment).Error
+	if err != nil {
+		log.Println(err)
+	}
+	if comment.Id == 0 {
+		return false
+	}
+	return true
 }
 func (c *CommentDao) AddCommentAndUpdateCount(comment *Comment) error {
 

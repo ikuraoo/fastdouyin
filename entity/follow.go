@@ -1,9 +1,7 @@
 package entity
 
 import (
-	"github.com/ikuraoo/fastdouyin/common"
 	"gorm.io/gorm"
-	"strconv"
 	"sync"
 	"time"
 )
@@ -31,16 +29,13 @@ func NewFollowDaoInstance() *FollowDao {
 	return followDao
 }
 
-func (*FollowDao) QueryIsFollow(myUId int64, hisUId int64) (bool, error) {
-	var follow Follow
-	err := db.Where("my_uid = ?", strconv.Itoa(int(myUId))).Where("his_uid = ?", strconv.Itoa(int(hisUId))).Find(&follow).Error
+func (*FollowDao) QueryIsFollow(userId int64, targetId int64) (bool, error) {
+
+	err := db.Where("my_uid = ? and his_uid = ?", userId, targetId).First(&Follow{}).Error
 	if err != nil {
 		return false, err
 	}
-	if follow.ID == common.WRONG_ID {
-		return false, nil
-	}
-	return true, nil
+	return true, err
 }
 
 func (*FollowDao) AddUserFollow(userId, followId int64) error {

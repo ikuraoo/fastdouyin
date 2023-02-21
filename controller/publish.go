@@ -8,15 +8,17 @@ import (
 	"github.com/ikuraoo/fastdouyin/util"
 	"net/http"
 	"path/filepath"
+	"strconv"
 )
 
 type VideoListResponse struct {
 	common.Response
-	VideoList []*common.VideoMessage `json:"video_list"`
+	VideoList []*common.VideoResponse `json:"video_list"`
 }
 
 // Publish check token then save upload file to public directory
 func Publish(c *gin.Context) {
+	//解析参数
 	rawUserId, ok := c.Get("userId")
 	if !ok {
 		common.SendError(c, "解析token失败")
@@ -28,6 +30,7 @@ func Publish(c *gin.Context) {
 		common.SendError(c, err.Error())
 	}
 
+	//视频路径
 	filename := filepath.Base(data.Filename)
 	finalName := fmt.Sprintf("%d_%s", userId, filename)
 	saveFile := filepath.Join("./public/videos/", finalName)
@@ -35,6 +38,7 @@ func Publish(c *gin.Context) {
 		common.SendError(c, err.Error())
 	}
 
+	//封面路径
 	coverName := util.NewFileCoverName(userId)
 	saveCoverFile := filepath.Join("./public/covers/", coverName)
 	err = util.SnapShotFromVideo(saveFile, saveCoverFile, 1)
@@ -54,13 +58,17 @@ func Publish(c *gin.Context) {
 
 // PublishList all users have same publish video list
 func PublishList(c *gin.Context) {
+	//解析参数
 	rawUserId, ok := c.Get("userId")
 	if !ok {
 		common.SendError(c, "解析token失败")
 	}
 	userId := rawUserId.(int64)
+	rawAuthorId := c.Query("user_id")
+	authorId, err := strconv.ParseInt(rawAuthorId, 10, 64)
 
-	videoFeed, err := service.PublishList(userId)
+	//service
+	videoFeed, err := service.PublishList(userId, authorId)
 	if err != nil {
 		common.SendError(c, err.Error())
 	}

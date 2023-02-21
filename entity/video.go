@@ -3,21 +3,22 @@ package entity
 import (
 	"errors"
 	"gorm.io/gorm"
+	"log"
 	"sync"
 	"time"
 )
 
 type Video struct {
-	Id             int64     `gorm:"column:id"`
-	UId            int64     `gorm:"column:uid"`
-	PlayUrl        string    `gorm:"column:play_url"`
-	CoverUrl       string    `gorm:"column:cover_url"`
-	CommentCount   int64     `gorm:"column:comment_count"`
-	FavouriteCount int64     `gorm:"column:favourite_count"`
-	Title          string    `gorm:"column:title"`
-	CreateTime     time.Time `gorm:"column:create_time"`
-	UpdateTime     time.Time `gorm:"column:update_time"`
-	IsDeleted      bool      `gorm:"column:is_deleted"`
+	Id            int64     `gorm:"column:id"`
+	UId           int64     `gorm:"column:uid"`
+	PlayUrl       string    `gorm:"column:play_url"`
+	CoverUrl      string    `gorm:"column:cover_url"`
+	CommentCount  int64     `gorm:"column:comment_count"`
+	FavoriteCount int64     `gorm:"column:favorite_count"`
+	Title         string    `gorm:"column:title"`
+	CreateTime    time.Time `gorm:"column:create_time"`
+	UpdateTime    time.Time `gorm:"column:update_time"`
+	IsDeleted     bool      `gorm:"column:is_deleted"`
 }
 
 type VideoDao struct {
@@ -43,11 +44,41 @@ func (*VideoDao) QueryVideos(maxNum int64, latestTime time.Time) (*[]Video, erro
 	return &videos, nil
 }
 
+func (*VideoDao) QueryAuther(vid int64) (uid int64, err error) {
+	var video Video
+	err = db.Where("id = ?", vid).Find(&video).Error
+	if err != nil {
+		return 0, err
+	}
+	return video.UId, nil
+}
+
+func (*VideoDao) QueryByVid(vid int64) (*Video, error) {
+	var video Video
+	err := db.Where("id = ?", vid).Find(&video).Error
+	if err != nil {
+		return nil, err
+	}
+	return &video, nil
+}
+
+func (*VideoDao) IsVideoExistById(id int64) bool {
+	var video Video
+	err := db.Where("id = ?", id).First(&video).Error
+	if err != nil {
+		log.Println(err)
+	}
+	if video.Id == 0 {
+		return false
+	}
+	return true
+}
+
 func (*VideoDao) QueryByAuther(uid int64) (*[]Video, error) {
 	var videos []Video
 	err := db.Where("uid = ?", uid).Find(&videos).Error
 	if err != nil {
-		return nil, err
+		return nil, errors.New("查询视频失败")
 	}
 	return &videos, nil
 }
@@ -69,20 +100,43 @@ func (*VideoDao) CreateVideo(video *Video, uid int64) error {
 	return nil
 }
 
-func (*VideoDao) PlusFavorite(videoId int64) error {
-	err := db.Model(&Video{}).Where("id = ?", videoId).UpdateColumn("favourite_count", gorm.Expr("favourite_count + ?", 1)).Error
-	if err != nil {
-		return err
-	}
-	return nil
+func (*VideoDao) PlusFavorite(userId, authorId, videoId int64) error {
+	return db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Exec("UPDATE videos SET favorite_count=favorite_count+1 WHERE id = ?", videoId).Error; err != nil {
+			return err
+		}
+		if err := tx.Exec("UPDATE users SET total_favorited=total_favorited+1 WHERE id = ?", authorId).Error; err != nil {
+			return err
+		}
+		if err := tx.Exec("UPDATE users SET favorite_count=favorite_count+1 WHERE id = ?", userId).Error; err != nil {
+			return err
+		}
+		//if err := tx.Exec("INSERT INTO `favourites` (`uid`,`vid`,'is_favourite','create_time', 'update_time') VALUES (?,?, true, time.Now(), time.Now())", userId, videoId).Error; err != nil {
+		if err := tx.Exec("INSERT INTO `favourites` (`uid`,`vid`) VALUES (?,?)", userId, videoId).Error; err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
-func (*VideoDao) MinusFavorite(videoId int64) error {
-	err := db.Model(&Video{}).Where("id = ? and favourite_count > 0", videoId).UpdateColumn("favourite_count", gorm.Expr("favourite_count - ?", 1)).Error
-	if err != nil {
-		return err
-	}
-	return nil
+func (*VideoDao) MinusFavorite(userId, authorId, videoId int64) error {
+
+	return db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Exec("UPDATE videos SET favorite_count=favorite_count-1 WHERE id = ? and favorite_count > 0", videoId).Error; err != nil {
+			return err
+		}
+		if err := tx.Exec("UPDATE users SET total_favorited=total_favorited-1 WHERE id = ?", authorId).Error; err != nil {
+			return err
+		}
+		if err := tx.Exec("UPDATE users SET favorite_count=favorite_count-1 WHERE id = ?", userId).Error; err != nil {
+			return err
+		}
+		//if err := tx.Exec("INSERT INTO `favourites` (`uid`,`vid`,'is_favourite','create_time', 'update_time') VALUES (?,?, true, time.Now(), time.Now())", userId, videoId).Error; err != nil {
+		if err := tx.Exec("DELETE FROM `favourites` WHERE `uid` = ? AND `vid` = ?", userId, videoId).Error; err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 func (*VideoDao) QueryFavorVideoListByUserId(userId int64) (*[]Video, error) {

@@ -6,7 +6,9 @@ import (
 )
 
 func SendError(c *gin.Context, message string) {
-	c.JSON(http.StatusOK, Response{StatusCode: RESP_MISTAKE, StatusMsg: message})
+	c.JSON(http.StatusOK, Response{
+		StatusCode: RESP_MISTAKE,
+		StatusMsg:  message})
 	return
 }
 
@@ -27,48 +29,34 @@ type Response struct {
 	StatusMsg  string `json:"status_msg,omitempty"`
 }
 
-type VideoMessage struct {
-	Id            int64       `json:"id,omitempty"`
-	Author        UserMessage `json:"author"`
-	PlayUrl       string      `json:"play_url" json:"play_url,omitempty"`
-	CoverUrl      string      `json:"cover_url"`
-	FavoriteCount int64       `json:"favorite_count"`
-	CommentCount  int64       `json:"comment_count"`
-	IsFavorite    bool        `json:"is_favorite"`
-	Title         string      `json:"title"`
+type VideoResponse struct {
+	Id            int64        `json:"id,omitempty"`
+	Author        UserResponse `json:"author"`
+	PlayUrl       string       `json:"play_url" json:"play_url,omitempty"`
+	CoverUrl      string       `json:"cover_url"`
+	FavoriteCount int64        `json:"favorite_count"`
+	CommentCount  int64        `json:"comment_count"`
+	IsFavorite    bool         `json:"is_favorite"`
+	Title         string       `json:"title"`
 }
 type Comment struct {
-	Id         int64       `json:"id,omitempty"`
-	User       UserMessage `json:"user"`
-	Content    string      `json:"content,omitempty"`
-	CreateDate string      `json:"create_date,omitempty"`
+	Id         int64        `json:"id,omitempty"`
+	User       UserResponse `json:"user"`
+	Content    string       `json:"content,omitempty"`
+	CreateDate string       `json:"create_date,omitempty"`
 }
 
-type UserMessage struct {
+type UserResponse struct {
 	//gorm.Model
-	Id             int64  `json:"id,omitempty"  gorm:"primaryKey"`
-	Name           string `json:"name,omitempty"`
-	FollowCount    int64  `json:"follow_count"`
-	FollowerCount  int64  `json:"follower_count"`
-	IsFollow       bool   `json:"is_follow"`
-	TotalFavorited int64  `json:"total_favorited"`
-	WorkCount      int64  `json:"work_count"`
-	FavoriteCount  int64  `json:"favorite_count"`
-}
-
-type Message struct {
-	Id         int64  `json:"id,omitempty"`
-	Content    string `json:"content,omitempty"`
-	CreateTime string `json:"create_time,omitempty"`
-}
-
-type MessageSendEvent struct {
-	UserId     int64  `json:"user_id,omitempty"`
-	ToUserId   int64  `json:"to_user_id,omitempty"`
-	MsgContent string `json:"msg_content,omitempty"`
-}
-
-type MessagePushEvent struct {
-	FromUserId int64  `json:"user_id,omitempty"`
-	MsgContent string `json:"msg_content,omitempty"`
+	Id              int64  `json:"id,omitempty"  gorm:"primaryKey"`
+	Name            string `json:"name,omitempty"`
+	FollowCount     int64  `json:"follow_count"`
+	FollowerCount   int64  `json:"follower_count"`
+	IsFollow        bool   `json:"is_follow"`
+	Avatar          string `json:"avatar,omitempty"`
+	BackgroundImage string `json:"background_image,omitempty"`
+	Signature       string `json:"signature,omitempty"`
+	TotalFavorited  int64  `json:"total_favorited"`
+	WorkCount       int64  `json:"work_count"`
+	FavoriteCount   int64  `json:"favorite_count"`
 }

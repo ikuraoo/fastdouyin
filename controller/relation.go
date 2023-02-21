@@ -10,23 +10,38 @@ import (
 
 type UserListResponse struct {
 	common.Response
-	UserList []*service.User `json:"user_list"`
+	UserList []*common.UserResponse `json:"user_list"`
 }
 
 // RelationAction no practical effect, just check if token is valid
 func RelationAction(c *gin.Context) {
-	rawUserId, _ := c.Get("my_uid")
-	userId, _ := rawUserId.(int64)
+	//解析参数
+	rawUserId, _ := c.Get("userId")
+	userId, ok := rawUserId.(int64)
+	if !ok {
+		common.SendError(c, "token解析失败")
+		return
+	}
 
 	rawFollowId := c.Query("to_user_id")
-	followId, _ := strconv.ParseInt(rawFollowId, 10, 64)
+	followId, err := strconv.ParseInt(rawFollowId, 10, 64)
+	if err != nil {
+		common.SendError(c, err.Error())
+		return
+	}
 
 	rawActionType := c.Query("action_type")
-	actionType, _ := strconv.ParseInt(rawActionType, 10, 32)
-
-	err := service.FollowAction(userId, followId, actionType)
+	actionType, err := strconv.ParseInt(rawActionType, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusOK, common.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+		common.SendError(c, err.Error())
+		return
+	}
+
+	//service
+	err = service.UserFollowAction(userId, followId, actionType)
+	if err != nil {
+		common.SendError(c, err.Error())
+		return
 	}
 	c.JSON(http.StatusOK, common.Response{StatusCode: 0})
 
@@ -34,12 +49,24 @@ func RelationAction(c *gin.Context) {
 
 // FollowList all users have same follow list
 func FollowList(c *gin.Context) {
-	rawUserId, _ := c.Get("my_uid")
-	userId, _ := rawUserId.(int64)
+	//解析参数
+	rawUserId, _ := c.Get("userId")
+	userId, ok := rawUserId.(int64)
+	if !ok {
+		common.SendError(c, "token解析失败")
+		return
+	}
 
-	list, err := service.QueryFollowList(userId)
+	rawtargetId := c.Query("user_id")
+	targetId, err := strconv.ParseInt(rawtargetId, 10, 64)
 	if err != nil {
-		c.JSON(http.StatusOK, common.Response{StatusCode: 1, StatusMsg: err.Error()})
+		common.SendError(c, err.Error())
+		return
+	}
+
+	list, err := service.QueryFollowList(userId, targetId)
+	if err != nil {
+		common.SendError(c, err.Error())
 	} else {
 		c.JSON(http.StatusOK, UserListResponse{
 			Response: common.Response{
@@ -53,10 +80,22 @@ func FollowList(c *gin.Context) {
 
 // FollowerList all users have same follower list
 func FollowerList(c *gin.Context) {
-	rawUserId, _ := c.Get("my_uid")
-	userId, _ := rawUserId.(int64)
+	//解析参数
+	rawUserId, _ := c.Get("userId")
+	userId, ok := rawUserId.(int64)
+	if !ok {
+		common.SendError(c, "token解析失败")
+		return
+	}
+	rawtargetId := c.Query("user_id")
+	targetId, err := strconv.ParseInt(rawtargetId, 10, 64)
+	if err != nil {
+		common.SendError(c, err.Error())
+		return
+	}
 
-	list, err := service.QueryFollowerList(userId)
+	//service层
+	list, err := service.QueryFollowerList(userId, targetId)
 	if err != nil {
 		c.JSON(http.StatusOK, common.Response{StatusCode: 1, StatusMsg: err.Error()})
 	} else {
@@ -68,14 +107,4 @@ func FollowerList(c *gin.Context) {
 		})
 	}
 
-}
-
-// FriendList all users have same friend list
-func FriendList(c *gin.Context) {
-	c.JSON(http.StatusOK, UserListResponse{
-		Response: common.Response{
-			StatusCode: 0,
-		},
-		//UserList: []User{DemoUser},
-	})
 }

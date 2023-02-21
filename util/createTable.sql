@@ -30,11 +30,13 @@ CREATE TABLE `users`  (
   `follower_count` bigint(20) NULL DEFAULT NULL,
   `total_favorited` bigint(20) NULL DEFAULT NULL,
   `work_count` bigint(20) NULL DEFAULT NULL,
+  `avatar` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
+  `background_image` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
+  `signature` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `favorite_count` bigint(20) NULL DEFAULT NULL,
   `create_time` datetime(3) NULL DEFAULT NULL,
   `update_time` datetime(3) NULL DEFAULT NULL,
   `is_deleted` tinyint(1) NULL DEFAULT NULL,
-
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
@@ -50,7 +52,7 @@ CREATE TABLE `videos`  (
   `play_url` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `cover_url` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `comment_count` bigint(20) NULL DEFAULT NULL,
-  `favourite_count` bigint(20) NULL DEFAULT NULL,
+  `favorite_count` bigint(20) NULL DEFAULT NULL,
   `title` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `create_time` datetime(3) NULL DEFAULT NULL,
   `update_time` datetime(3) NULL DEFAULT NULL,
@@ -89,7 +91,7 @@ CREATE TABLE `favourites`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `uid` bigint(20) NULL DEFAULT NULL,
   `vid` bigint(20) NULL DEFAULT NULL,
-  `is_favourite` tinyint(1) NULL DEFAULT NULL,
+  `is_favorite` tinyint(1) NULL DEFAULT NULL,
   `create_time` datetime(3) NULL DEFAULT NULL,
   `update_time` datetime(3) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,

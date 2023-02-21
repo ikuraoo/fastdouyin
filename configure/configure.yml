@@ -15,3 +15,7 @@ video:
 path:
   ffmpeg_path: "D:\\Program Files (x86)\\ffmpeg-master-latest-win64-gpl-shared\\bin\\ffmpeg.exe"
   static_source_path: "D:\\Users\\DELL\\Desktop\\GolandCodes\\fastdouyin\\static"
+Redis:
+  ip: "127.0.0.1"
+  port: 6379
+  database: 0
