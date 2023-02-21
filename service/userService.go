@@ -94,16 +94,19 @@ func (u *UserRegisterMessage) register() (int64, error) {
 
 	user := &entity.User{
 		//Id:            0,
-		Name:           u.name,
-		Password:       string(password),
-		FollowCount:    0,
-		FollowerCount:  0,
-		TotalFavorited: 0,
-		WorkCount:      0,
-		FavoriteCount:  0,
-		CreateTime:     time.Now(),
-		UpdateTime:     time.Now(),
-		IsDeleted:      false,
+		Name:            u.name,
+		Password:        string(password),
+		FollowCount:     0,
+		FollowerCount:   0,
+		TotalFavorited:  0,
+		WorkCount:       0,
+		FavoriteCount:   0,
+		Avatar:          "https://www.gx8899.com/uploads/allimg/2018031109/qzfrr5ly3af.jpg",
+		BackgroundImage: "https://api.dujin.org/bing/1366.php",
+		Signature:       "这是我的简介",
+		CreateTime:      time.Now(),
+		UpdateTime:      time.Now(),
+		IsDeleted:       false,
 	}
 	err = entity.NewUserDaoInstance().CreateUser(user)
 	if err != nil {
