@@ -2,6 +2,7 @@ package entity
 
 import (
 	"errors"
+	"github.com/ikuraoo/fastdouyin/configure"
 	"gorm.io/gorm"
 	"log"
 	"sync"
@@ -37,7 +38,7 @@ func NewVideoDaoInstance() *VideoDao {
 
 func (*VideoDao) QueryVideos(maxNum int64, latestTime time.Time) (*[]Video, error) {
 	var videos []Video
-	err := db.Where("create_time<=?", latestTime).Order("create_time DESC").Limit(int(maxNum)).Find(&videos).Error
+	err := configure.Db.Where("create_time<=?", latestTime).Order("create_time DESC").Limit(int(maxNum)).Find(&videos).Error
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +47,7 @@ func (*VideoDao) QueryVideos(maxNum int64, latestTime time.Time) (*[]Video, erro
 
 func (*VideoDao) QueryAuther(vid int64) (uid int64, err error) {
 	var video Video
-	err = db.Where("id = ?", vid).Find(&video).Error
+	err = configure.Db.Where("id = ?", vid).Find(&video).Error
 	if err != nil {
 		return 0, err
 	}
@@ -55,7 +56,7 @@ func (*VideoDao) QueryAuther(vid int64) (uid int64, err error) {
 
 func (*VideoDao) QueryByVid(vid int64) (*Video, error) {
 	var video Video
-	err := db.Where("id = ?", vid).Find(&video).Error
+	err := configure.Db.Where("id = ?", vid).Find(&video).Error
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +65,7 @@ func (*VideoDao) QueryByVid(vid int64) (*Video, error) {
 
 func (*VideoDao) IsVideoExistById(id int64) bool {
 	var video Video
-	err := db.Where("id = ?", id).First(&video).Error
+	err := configure.Db.Where("id = ?", id).First(&video).Error
 	if err != nil {
 		log.Println(err)
 	}
@@ -76,7 +77,7 @@ func (*VideoDao) IsVideoExistById(id int64) bool {
 
 func (*VideoDao) QueryByAuther(uid int64) (*[]Video, error) {
 	var videos []Video
-	err := db.Where("uid = ?", uid).Find(&videos).Error
+	err := configure.Db.Where("uid = ?", uid).Find(&videos).Error
 	if err != nil {
 		return nil, errors.New("查询视频失败")
 	}
@@ -84,7 +85,7 @@ func (*VideoDao) QueryByAuther(uid int64) (*[]Video, error) {
 }
 
 func (*VideoDao) CreateVideo(video *Video, uid int64) error {
-	return db.Transaction(func(tx *gorm.DB) error {
+	return configure.Db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(video).Error; err != nil {
 			return err
 		}
@@ -93,7 +94,7 @@ func (*VideoDao) CreateVideo(video *Video, uid int64) error {
 		}
 		return nil
 	})
-	err := db.Create(video).Error
+	err := configure.Db.Create(video).Error
 	if err != nil {
 		return err
 	}
@@ -101,7 +102,7 @@ func (*VideoDao) CreateVideo(video *Video, uid int64) error {
 }
 
 func (*VideoDao) PlusFavorite(userId, authorId, videoId int64) error {
-	return db.Transaction(func(tx *gorm.DB) error {
+	return configure.Db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Exec("UPDATE videos SET favorite_count=favorite_count+1 WHERE id = ?", videoId).Error; err != nil {
 			return err
 		}
@@ -121,7 +122,7 @@ func (*VideoDao) PlusFavorite(userId, authorId, videoId int64) error {
 
 func (*VideoDao) MinusFavorite(userId, authorId, videoId int64) error {
 
-	return db.Transaction(func(tx *gorm.DB) error {
+	return configure.Db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Exec("UPDATE videos SET favorite_count=favorite_count-1 WHERE id = ? and favorite_count > 0", videoId).Error; err != nil {
 			return err
 		}
@@ -141,7 +142,7 @@ func (*VideoDao) MinusFavorite(userId, authorId, videoId int64) error {
 
 func (*VideoDao) QueryFavorVideoListByUserId(userId int64) (*[]Video, error) {
 	var videoList []Video
-	if err := db.Raw("SELECT v.* FROM videos v , favourites u WHERE u.uid = ? AND u.vid = v.id", userId).Scan(&videoList).Error; err != nil {
+	if err := configure.Db.Raw("SELECT v.* FROM videos v , favourites u WHERE u.uid = ? AND u.vid = v.id", userId).Scan(&videoList).Error; err != nil {
 		return nil, err
 	}
 	return &videoList, nil
@@ -151,5 +152,5 @@ func (*VideoDao) QueryVideoCountByUserId(userId int64, count *int64) error {
 	if count == nil {
 		return errors.New("QueryVideoCountByUserId count 空指针")
 	}
-	return db.Model(&Video{}).Where("uid=?", userId).Count(count).Error
+	return configure.Db.Model(&Video{}).Where("uid=?", userId).Count(count).Error
 }

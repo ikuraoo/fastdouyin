@@ -2,6 +2,7 @@ package entity
 
 import (
 	"errors"
+	"github.com/ikuraoo/fastdouyin/configure"
 	"gorm.io/gorm"
 	"log"
 	"sync"
@@ -34,7 +35,7 @@ func NewCommentDaoInstance() *CommentDao {
 
 func (c *CommentDao) QueryCommentById(commentId int64) (*Comment, error) {
 	var comment Comment
-	err := db.Where("id = ?", commentId).First(&comment).Error
+	err := configure.Db.Where("id = ?", commentId).First(&comment).Error
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +44,7 @@ func (c *CommentDao) QueryCommentById(commentId int64) (*Comment, error) {
 
 func (c *CommentDao) IsCommenExistById(id int64) bool {
 	var comment Comment
-	err := db.Where("id = ?", id).First(&comment).Error
+	err := configure.Db.Where("id = ?", id).First(&comment).Error
 	if err != nil {
 		log.Println(err)
 	}
@@ -55,7 +56,7 @@ func (c *CommentDao) IsCommenExistById(id int64) bool {
 func (c *CommentDao) AddCommentAndUpdateCount(comment *Comment) error {
 
 	//执行事务
-	return db.Transaction(func(tx *gorm.DB) error {
+	return configure.Db.Transaction(func(tx *gorm.DB) error {
 		//添加评论数据
 		if err := tx.Create(comment).Error; err != nil {
 			// 返回任何错误都会回滚事务
@@ -72,7 +73,7 @@ func (c *CommentDao) AddCommentAndUpdateCount(comment *Comment) error {
 
 func (c *CommentDao) DeleteCommentAndUpdateCountById(commentId, videoId int64) error {
 	//执行事务
-	return db.Transaction(func(tx *gorm.DB) error {
+	return configure.Db.Transaction(func(tx *gorm.DB) error {
 		//删除评论
 		if err := tx.Exec("DELETE FROM comments WHERE id = ?", commentId).Error; err != nil {
 			// 返回任何错误都会回滚事务
@@ -91,7 +92,7 @@ func (c *CommentDao) QueryCommentListByVideoId(videoId int64, comments *[]*Comme
 	if comments == nil {
 		return errors.New("QueryCommentListByVideoId comments空指针")
 	}
-	if err := db.Model(&Comment{}).Where("vid=?", videoId).Find(comments).Error; err != nil {
+	if err := configure.Db.Model(&Comment{}).Where("vid=?", videoId).Find(comments).Error; err != nil {
 		return err
 	}
 	return nil

@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"github.com/ikuraoo/fastdouyin/common"
+	"github.com/ikuraoo/fastdouyin/configure"
 	"github.com/ikuraoo/fastdouyin/entity"
 )
 
@@ -65,13 +66,17 @@ func (f *FavoriteActionMessage) checkNum() error {
 }
 
 func (f *FavoriteActionMessage) PlusOperation() error {
-	//视频点赞数目+1
-	exist, _ := entity.NewFavoriteDaoInstance().GetVideoFavorState(f.userId, f.videoId)
+	//视频点赞数目+1, 查缓存
+	exist := configure.NewProxyIndexMap().GetVideoFavor(f.userId, f.videoId)
+	//exist, _ := entity.NewFavoriteDaoInstance().GetVideoFavorState(f.userId, f.videoId)
 	if !exist {
+		configure.NewProxyIndexMap().SetVideoFavor(f.userId, f.videoId, true)
 		err := entity.NewVideoDaoInstance().PlusFavorite(f.userId, f.authorId, f.videoId)
 		if err != nil {
 			return err
 		}
+		//更新Redis
+
 	} else {
 		return errors.New("已经点过赞")
 	}
@@ -80,10 +85,13 @@ func (f *FavoriteActionMessage) PlusOperation() error {
 }
 
 func (f *FavoriteActionMessage) MinusOperation() error {
-	//视频点赞数目-1
-	exist, _ := entity.NewFavoriteDaoInstance().GetVideoFavorState(f.userId, f.videoId)
+	//视频点赞数目-1， 查缓存
+	exist := configure.NewProxyIndexMap().GetVideoFavor(f.userId, f.videoId)
+	//exist, _ := entity.NewFavoriteDaoInstance().GetVideoFavorState(f.userId, f.videoId)
 	if exist {
 		err := entity.NewVideoDaoInstance().MinusFavorite(f.userId, f.authorId, f.videoId)
+		//更新Redis
+		configure.NewProxyIndexMap().SetVideoFavor(f.userId, f.videoId, false)
 		if err != nil {
 			return err
 		}

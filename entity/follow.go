@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"github.com/ikuraoo/fastdouyin/configure"
 	"gorm.io/gorm"
 	"sync"
 	"time"
@@ -31,7 +32,7 @@ func NewFollowDaoInstance() *FollowDao {
 
 func (*FollowDao) QueryIsFollow(userId int64, targetId int64) (bool, error) {
 
-	err := db.Where("my_uid = ? and his_uid = ?", userId, targetId).First(&Follow{}).Error
+	err := configure.Db.Where("my_uid = ? and his_uid = ?", userId, targetId).First(&Follow{}).Error
 	if err != nil {
 		return false, err
 	}
@@ -39,7 +40,7 @@ func (*FollowDao) QueryIsFollow(userId int64, targetId int64) (bool, error) {
 }
 
 func (*FollowDao) AddUserFollow(userId, followId int64) error {
-	return db.Transaction(func(tx *gorm.DB) error {
+	return configure.Db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Exec("UPDATE users SET follow_count=follow_count+1 WHERE id = ?", userId).Error; err != nil {
 			return err
 		}
@@ -53,7 +54,7 @@ func (*FollowDao) AddUserFollow(userId, followId int64) error {
 	})
 }
 func (*FollowDao) CancelUserFollow(userId, followId int64) error {
-	return db.Transaction(func(tx *gorm.DB) error {
+	return configure.Db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Exec("UPDATE users SET follow_count=follow_count-1 WHERE id = ? AND follow_count>0", userId).Error; err != nil {
 			return err
 		}

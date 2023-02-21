@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"github.com/ikuraoo/fastdouyin/configure"
 	"sync"
 	"time"
 )
@@ -28,24 +29,8 @@ func NewFavoriteDaoInstance() *FavoriteDao {
 	return favoriteDao
 }
 
-func (*FavoriteDao) CreateFavourite(favourite *Favourite) error {
-	err := db.Create(favourite).Error
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (*FavoriteDao) DeleteFavouriteByUidVid(uid, vid int64) error {
-	err := db.Where("uid = ? and vid = ?", uid, vid).Delete(Favourite{}).Error
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (*FavoriteDao) GetVideoFavorState(uid, vid int64) (bool, error) {
-	err := db.Where("uid = ? and vid = ?", uid, vid).First(&Favourite{}).Error
+	err := configure.Db.Where("uid = ? and vid = ?", uid, vid).First(&Favourite{}).Error
 	if err != nil {
 		return false, err
 	}

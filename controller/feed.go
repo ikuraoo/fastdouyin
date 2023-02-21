@@ -19,6 +19,7 @@ type FeedResponse struct {
 
 // Feed same demo video list for every request
 func Feed(c *gin.Context) {
+	//解析参数
 	var latestTime time.Time
 	rawTimestamp, ok := c.GetQuery("latest_time")
 	if !ok || rawTimestamp == "" {

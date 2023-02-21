@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/ikuraoo/fastdouyin/common"
+	"github.com/ikuraoo/fastdouyin/configure"
 	"github.com/ikuraoo/fastdouyin/entity"
 	"github.com/spf13/viper"
 	"strconv"
@@ -40,7 +41,8 @@ func CombinationVideosAndUser(UserId int64, videos *[]entity.Video) ([]*common.V
 		if err != nil {
 			continue
 		}
-		isfavorite, _ := entity.NewFavoriteDaoInstance().GetVideoFavorState(UserId, video.Id)
+		isfavorite := configure.NewProxyIndexMap().GetVideoFavor(UserId, video.Id)
+		//isfavorite, _ := entity.NewFavoriteDaoInstance().GetVideoFavorState(UserId, video.Id)
 		authorMessage, _ := ConvertToUserResponse(author, UserId)
 		videoResponse := common.VideoResponse{
 			Id:            video.Id,

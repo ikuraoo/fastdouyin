@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"github.com/ikuraoo/fastdouyin/common"
+	"github.com/ikuraoo/fastdouyin/configure"
 	"github.com/ikuraoo/fastdouyin/entity"
 	"golang.org/x/crypto/bcrypt"
 	"time"
@@ -137,7 +138,8 @@ func ConvertToUserResponse(author *entity.User, userId int64) (*common.UserRespo
 	} else if userId == author.Id {
 		isfollow = true
 	} else {
-		isfollow, _ = entity.NewFollowDaoInstance().QueryIsFollow(userId, author.Id)
+		isfollow = configure.NewProxyIndexMap().GetAFollowB(userId, author.Id)
+		//isfollow, _ = entity.NewFollowDaoInstance().QueryIsFollow(userId, author.Id)
 	}
 
 	userResponse := common.UserResponse{

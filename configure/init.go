@@ -1,21 +1,17 @@
-package entity
+package configure
 
 import (
 	"fmt"
-
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
+var Db *gorm.DB
 
 func Init() error {
 	err := InitDB()
-	//print(db)
-	//var user User
-	//db.Find(&user, 2)
-	//fmt.Println(user)
+	InitRedis()
 	return err
 }
 
@@ -35,11 +31,11 @@ func InitDB() error {
 		database,
 		charset)
 	//dsn := "root:root@tcp(127.0.0.1:3306)/dousheng?charset=utf8mb4&parseTime=true"
-	fmt.Println(dsn)
 	var err error
-	db, err = gorm.Open(
+	Db, err = gorm.Open(
 		mysql.Open(dsn),
 		&gorm.Config{},
 	)
 	return err
+
 }

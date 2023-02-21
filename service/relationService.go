@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"github.com/ikuraoo/fastdouyin/configure"
 
 	"github.com/ikuraoo/fastdouyin/common"
 	"github.com/ikuraoo/fastdouyin/entity"
@@ -64,9 +65,12 @@ func (f *FollowActionMessage) PlusOperation() error {
 	if f.userId == f.followId {
 		return errors.New("自己不能关注自己")
 	}
-	isfollow, _ := entity.NewFollowDaoInstance().QueryIsFollow(f.userId, f.followId)
+	isfollow := configure.NewProxyIndexMap().GetAFollowB(f.userId, f.followId)
+	//isfollow, _ := entity.NewFollowDaoInstance().QueryIsFollow(f.userId, f.followId)
 	if !isfollow {
 		err := entity.NewFollowDaoInstance().AddUserFollow(f.userId, f.followId)
+		//同时插入redis缓存
+		configure.NewProxyIndexMap().SetAFollowB(f.userId, f.followId, true)
 		if err != nil {
 			return err
 		}
@@ -80,10 +84,13 @@ func (f *FollowActionMessage) CancelOperation() error {
 	if f.userId == f.followId {
 		return errors.New("")
 	}
-	//查询是否关注
-	isfollow, _ := entity.NewFollowDaoInstance().QueryIsFollow(f.userId, f.followId)
+	//查询是否关注,查缓存
+	isfollow := configure.NewProxyIndexMap().GetAFollowB(f.userId, f.followId)
+	//isfollow, _ := entity.NewFollowDaoInstance().QueryIsFollow(f.userId, f.followId)
 	if isfollow {
 		err := entity.NewFollowDaoInstance().CancelUserFollow(f.userId, f.followId)
+		//同时更新redis缓存
+		configure.NewProxyIndexMap().SetAFollowB(f.userId, f.followId, false)
 		if err != nil {
 			return err
 		}

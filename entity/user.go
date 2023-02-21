@@ -3,6 +3,7 @@ package entity
 import (
 	"errors"
 	"github.com/ikuraoo/fastdouyin/common"
+	"github.com/ikuraoo/fastdouyin/configure"
 	"log"
 	"sync"
 	"time"
@@ -41,7 +42,7 @@ func NewUserDaoInstance() *UserDao {
 
 func (*UserDao) QueryById(id int64) (*User, error) {
 	var user User
-	err := db.Where("id = ?", id).First(&user).Error
+	err := configure.Db.Where("id = ?", id).First(&user).Error
 	if err != nil {
 		return nil, errors.New(common.USER_NOT_EXIT)
 	}
@@ -49,7 +50,7 @@ func (*UserDao) QueryById(id int64) (*User, error) {
 }
 func (*UserDao) IsUserExistById(id int64) bool {
 	var user User
-	err := db.Where("id = ?", id).First(&user).Error
+	err := configure.Db.Where("id = ?", id).First(&user).Error
 	if err != nil {
 		log.Println(err)
 	}
@@ -60,7 +61,7 @@ func (*UserDao) IsUserExistById(id int64) bool {
 }
 func (*UserDao) IsUserExistByName(name string) bool {
 	var user User
-	err := db.Where("name = ?", name).First(&user).Error
+	err := configure.Db.Where("name = ?", name).First(&user).Error
 	if err != nil {
 		log.Println(err)
 	}
@@ -71,7 +72,7 @@ func (*UserDao) IsUserExistByName(name string) bool {
 }
 func (*UserDao) QueryByName(name string) (*User, error) {
 	var user User
-	err := db.Where("name = ?", name).Find(&user).Error
+	err := configure.Db.Where("name = ?", name).Find(&user).Error
 	if err != nil {
 		return nil, errors.New("查询出错")
 	}
@@ -82,7 +83,7 @@ func (*UserDao) QueryByName(name string) (*User, error) {
 }
 
 func (*UserDao) CreateUser(user *User) error {
-	err := db.Create(user).Error
+	err := configure.Db.Create(user).Error
 	if err != nil {
 		return err
 	}
@@ -94,7 +95,7 @@ func (*UserDao) GetFollowListByUserId(userId int64, userList *[]*User) error {
 		return errors.New("空指针错误")
 	}
 	var err error
-	if err = db.Raw("SELECT u.* FROM users u, follows f WHERE f.my_uid = ? AND f.his_uid = u.id", userId).Scan(&userList).Error; err != nil {
+	if err = configure.Db.Raw("SELECT u.* FROM users u, follows f WHERE f.my_uid = ? AND f.his_uid = u.id", userId).Scan(&userList).Error; err != nil {
 		return err
 	}
 	return nil
@@ -105,7 +106,7 @@ func (*UserDao) GetFollowerListByUserId(userId int64, userList *[]*User) error {
 		return errors.New("空指针错误")
 	}
 	var err error
-	if err = db.Raw("SELECT u.* FROM users u, follows f WHERE f.his_uid = ? AND f.my_uid = u.id", userId).Scan(&userList).Error; err != nil {
+	if err = configure.Db.Raw("SELECT u.* FROM users u, follows f WHERE f.his_uid = ? AND f.my_uid = u.id", userId).Scan(&userList).Error; err != nil {
 		return err
 	}
 

@@ -37,7 +37,7 @@ func RelationAction(c *gin.Context) {
 		return
 	}
 
-	//service
+	//service层
 	err = service.UserFollowAction(userId, followId, actionType)
 	if err != nil {
 		common.SendError(c, err.Error())

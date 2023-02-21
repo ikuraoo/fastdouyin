@@ -33,6 +33,7 @@ func FavoriteAction(c *gin.Context) {
 	err = service.UserFavoriteAction(userId, videoId, actionType)
 	if err != nil {
 		common.SendError(c, err.Error())
+		return
 	}
 	c.JSON(http.StatusOK, common.Response{StatusCode: 0})
 
@@ -52,6 +53,7 @@ func FavoriteList(c *gin.Context) {
 		common.SendError(c, err.Error())
 	}
 
+	//调用service
 	uidFavorVideoList, err := service.QueryUserFavorList(userId, targetId)
 	if err != nil {
 		common.SendError(c, err.Error())
