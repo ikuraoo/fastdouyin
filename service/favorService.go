@@ -103,12 +103,8 @@ func (f *FavoriteActionMessage) MinusOperation() error {
 
 func QueryUserFavorList(userId, targetId int64) ([]*common.VideoResponse, error) {
 	//检查user是否存在
-	_, err := entity.NewUserDaoInstance().QueryById(userId)
-	if err != nil {
-		return nil, errors.New("user don't exist")
-	}
-	_, err = entity.NewUserDaoInstance().QueryById(targetId)
-	if err != nil {
+	exist := entity.NewUserDaoInstance().IsUserExistById(targetId)
+	if !exist {
 		return nil, errors.New("user don't exist")
 	}
 

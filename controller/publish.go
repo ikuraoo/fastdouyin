@@ -60,10 +60,16 @@ func Publish(c *gin.Context) {
 func PublishList(c *gin.Context) {
 	//解析参数
 	rawUserId, ok := c.Get("userId")
+	var userId int64
 	if !ok {
 		common.SendError(c, "解析token失败")
+		return
+		//userId = 0
+
+	} else {
+		userId = rawUserId.(int64)
 	}
-	userId := rawUserId.(int64)
+
 	rawAuthorId := c.Query("user_id")
 	authorId, err := strconv.ParseInt(rawAuthorId, 10, 64)
 

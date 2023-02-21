@@ -38,6 +38,7 @@ func NewProxyIndexMap() *ProxyCache {
 
 // GetVideoFavor 获取点赞状态 ret： true点赞 false未点赞
 func (p *ProxyCache) GetVideoFavor(uid, vid int64) bool {
+
 	key := fmt.Sprintf("%dfavor:", uid)
 	return rdb.SIsMember(ctx, key, vid).Val()
 }

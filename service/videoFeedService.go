@@ -35,13 +35,20 @@ func CombinationVideosAndUser(UserId int64, videos *[]entity.Video) ([]*common.V
 	var video entity.Video
 	var author *entity.User
 	var err error
+	var isfavorite bool
+
 	var videosWithUsers = make([]*common.VideoResponse, 0)
 	for _, video = range *videos {
 		author, err = entity.NewUserDaoInstance().QueryById(video.UId)
 		if err != nil {
 			continue
 		}
-		isfavorite := configure.NewProxyIndexMap().GetVideoFavor(UserId, video.Id)
+		if UserId == 0 {
+			isfavorite = false
+		} else {
+			isfavorite = configure.NewProxyIndexMap().GetVideoFavor(UserId, video.Id)
+		}
+
 		//isfavorite, _ := entity.NewFavoriteDaoInstance().GetVideoFavorState(UserId, video.Id)
 		authorMessage, _ := ConvertToUserResponse(author, UserId)
 		videoResponse := common.VideoResponse{

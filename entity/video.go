@@ -126,10 +126,10 @@ func (*VideoDao) MinusFavorite(userId, authorId, videoId int64) error {
 		if err := tx.Exec("UPDATE videos SET favorite_count=favorite_count-1 WHERE id = ? and favorite_count > 0", videoId).Error; err != nil {
 			return err
 		}
-		if err := tx.Exec("UPDATE users SET total_favorited=total_favorited-1 WHERE id = ?", authorId).Error; err != nil {
+		if err := tx.Exec("UPDATE users SET total_favorited=total_favorited-1 WHERE id = ? and favorite_count > 0", authorId).Error; err != nil {
 			return err
 		}
-		if err := tx.Exec("UPDATE users SET favorite_count=favorite_count-1 WHERE id = ?", userId).Error; err != nil {
+		if err := tx.Exec("UPDATE users SET favorite_count=favorite_count-1 WHERE id = ? and favorite_count > 0", userId).Error; err != nil {
 			return err
 		}
 		//if err := tx.Exec("INSERT INTO `favourites` (`uid`,`vid`,'is_favourite','create_time', 'update_time') VALUES (?,?, true, time.Now(), time.Now())", userId, videoId).Error; err != nil {

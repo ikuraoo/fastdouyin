@@ -42,11 +42,17 @@ func FavoriteAction(c *gin.Context) {
 // FavoriteList all users have same favorite video list
 func FavoriteList(c *gin.Context) {
 	//解析参数
-	rawUserId, _ := c.Get("userId")
-	userId, ok := rawUserId.(int64)
+	rawUserId, ok := c.Get("userId")
+	var userId int64
 	if !ok {
-		common.SendError(c, "token解析失败")
+		common.SendError(c, "解析token失败")
+		return
+		//userId = 0
+
+	} else {
+		userId = rawUserId.(int64)
 	}
+
 	id := c.Query("user_id")
 	targetId, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
