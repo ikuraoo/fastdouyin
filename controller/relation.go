@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/ikuraoo/fastdouyin/common"
+	"github.com/ikuraoo/fastdouyin/middleware"
 	"github.com/ikuraoo/fastdouyin/service"
 	"net/http"
 	"strconv"
@@ -50,11 +51,16 @@ func RelationAction(c *gin.Context) {
 // FollowList all users have same follow list
 func FollowList(c *gin.Context) {
 	//解析参数
-	rawUserId, _ := c.Get("userId")
-	userId, ok := rawUserId.(int64)
-	if !ok {
-		common.SendError(c, "token解析失败")
-		return
+	var userId int64
+	tokenStr := c.Query("token")
+	if tokenStr == "" {
+		tokenStr = c.PostForm("token")
+	}
+	token, claims, err := middleware.ParseToken(tokenStr)
+	if err != nil || !token.Valid {
+		userId = 0
+	} else {
+		userId = claims.UserId
 	}
 
 	rawtargetId := c.Query("user_id")
@@ -81,11 +87,16 @@ func FollowList(c *gin.Context) {
 // FollowerList all users have same follower list
 func FollowerList(c *gin.Context) {
 	//解析参数
-	rawUserId, _ := c.Get("userId")
-	userId, ok := rawUserId.(int64)
-	if !ok {
-		common.SendError(c, "token解析失败")
-		return
+	var userId int64
+	tokenStr := c.Query("token")
+	if tokenStr == "" {
+		tokenStr = c.PostForm("token")
+	}
+	token, claims, err := middleware.ParseToken(tokenStr)
+	if err != nil || !token.Valid {
+		userId = 0
+	} else {
+		userId = claims.UserId
 	}
 	rawtargetId := c.Query("user_id")
 	targetId, err := strconv.ParseInt(rawtargetId, 10, 64)

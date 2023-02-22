@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/ikuraoo/fastdouyin/common"
+	"github.com/ikuraoo/fastdouyin/middleware"
 	"github.com/ikuraoo/fastdouyin/service"
 	"github.com/ikuraoo/fastdouyin/util"
 	"net/http"
@@ -59,16 +60,28 @@ func Publish(c *gin.Context) {
 // PublishList all users have same publish video list
 func PublishList(c *gin.Context) {
 	//解析参数
-	rawUserId, ok := c.Get("userId")
 	var userId int64
-	if !ok {
-		common.SendError(c, "解析token失败")
-		return
-		//userId = 0
-
-	} else {
-		userId = rawUserId.(int64)
+	tokenStr := c.Query("token")
+	if tokenStr == "" {
+		tokenStr = c.PostForm("token")
 	}
+	token, claims, err := middleware.ParseToken(tokenStr)
+	if err != nil || !token.Valid {
+		userId = 0
+	} else {
+		userId = claims.UserId
+	}
+	/*
+		rawUserId, ok := c.Get("userId")
+		var userId int64
+		if !ok {
+			common.SendError(c, "解析token失败")
+			return
+		} else {
+			userId = rawUserId.(int64)
+		}
+
+	*/
 
 	rawAuthorId := c.Query("user_id")
 	authorId, err := strconv.ParseInt(rawAuthorId, 10, 64)

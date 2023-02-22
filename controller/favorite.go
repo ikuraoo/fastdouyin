@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/ikuraoo/fastdouyin/common"
+	"github.com/ikuraoo/fastdouyin/middleware"
 	"github.com/ikuraoo/fastdouyin/service"
 	"net/http"
 	"strconv"
@@ -42,17 +43,30 @@ func FavoriteAction(c *gin.Context) {
 // FavoriteList all users have same favorite video list
 func FavoriteList(c *gin.Context) {
 	//解析参数
-	rawUserId, ok := c.Get("userId")
+	/*
+		rawUserId, ok := c.Get("userId")
+		var userId int64
+		if !ok {
+			common.SendError(c, "解析token失败")
+			return
+			//userId = 0
+
+		} else {
+			userId = rawUserId.(int64)
+		}
+
+	*/
 	var userId int64
-	if !ok {
-		common.SendError(c, "解析token失败")
-		return
-		//userId = 0
-
-	} else {
-		userId = rawUserId.(int64)
+	tokenStr := c.Query("token")
+	if tokenStr == "" {
+		tokenStr = c.PostForm("token")
 	}
-
+	token, claims, err := middleware.ParseToken(tokenStr)
+	if err != nil || !token.Valid {
+		userId = 0
+	} else {
+		userId = claims.UserId
+	}
 	id := c.Query("user_id")
 	targetId, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {

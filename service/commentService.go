@@ -86,7 +86,7 @@ func DeleteComment(commentId, videoId int64) (*common.Comment, error) {
 	return commentResponse, nil
 }
 
-func QueryCommentList(userId, videoId int64) ([]*entity.Comment, error) {
+func QueryCommentList(videoId int64) ([]*entity.Comment, error) {
 	var comments []*entity.Comment
 	err := entity.NewCommentDaoInstance().QueryCommentListByVideoId(videoId, &comments)
 	if err != nil {

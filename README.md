@@ -7,15 +7,15 @@
 工程无其他依赖，直接编译运行即可
 
 ```shell
-go build && ./simple-demo
+go build && ./fastdouyin[fastdouyin-shliang.zip](..%2Ffastdouyin-shliang.zip)
 ```
 
 ### 功能说明
 
-接口功能不完善，仅作为示例
+实现了基础接口全部、互动接口全部、社交接口的关系操作、关注列表以及粉丝列表。
 
-* 用户登录数据保存在内存中，单次运行过程中有效
-* 视频上传后会保存到本地 public 目录中，访问时用 127.0.0.1:8080/static/video_name 即可
+* 用户登录数据，点赞关注等信息都会保存在Mysql中，点赞关注等操作会同时缓存到Redis中，来优化读取速度。
+* 视频上传后会保存到本地 public\videos 目录中，视频第一帧截图作为封面会保存到本地 public\covers 目录中，头像背景墙保存在本地public的avatar和background-image中。
 
 ### 测试
 

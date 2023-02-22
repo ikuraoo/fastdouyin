@@ -66,14 +66,24 @@ func CommentAction(c *gin.Context) {
 
 // CommentList all videos have same demo comment list
 func CommentList(c *gin.Context) {
+	/*
+		var userId int64
+		tokenStr := c.Query("token")
+		if tokenStr == "" {
+			tokenStr = c.PostForm("token")
+		}
+		token, claims, err := middleware.ParseToken(tokenStr)
+		if err != nil || !token.Valid {
+			userId = 0
+		} else {
+			userId = claims.UserId
+		}
 
-	rawUserId, _ := c.Get("userId")
-	userId, _ := rawUserId.(int64)
-
+	*/
 	rawVideoId := c.Query("video_id")
 	videoId, _ := strconv.ParseInt(rawVideoId, 10, 64)
 
-	commentList, err := service.QueryCommentList(userId, videoId)
+	commentList, err := service.QueryCommentList(videoId)
 	commentListwithuser, err := service.CombinationCommentsAndUsers(commentList)
 	if err != nil {
 		c.JSON(http.StatusOK, common.Response{StatusCode: 1, StatusMsg: err.Error()})

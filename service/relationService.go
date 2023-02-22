@@ -102,11 +102,8 @@ func (f *FollowActionMessage) CancelOperation() error {
 
 func QueryFollowList(userId, targetId int64) ([]*common.UserResponse, error) {
 	//检查参数
-	_, err := entity.NewVideoDaoInstance().QueryAuther(userId)
-	if err != nil {
-		return nil, errors.New("用户不存在")
-	}
-	_, err = entity.NewVideoDaoInstance().QueryAuther(targetId)
+
+	_, err := entity.NewVideoDaoInstance().QueryAuther(targetId)
 	if err != nil {
 		return nil, errors.New("用户不存在")
 	}
@@ -123,11 +120,7 @@ func QueryFollowList(userId, targetId int64) ([]*common.UserResponse, error) {
 
 func QueryFollowerList(userId, targetId int64) ([]*common.UserResponse, error) {
 	//检查参数
-	_, err := entity.NewVideoDaoInstance().QueryAuther(userId)
-	if err != nil {
-		return nil, errors.New("用户不存在")
-	}
-	_, err = entity.NewVideoDaoInstance().QueryAuther(targetId)
+	_, err := entity.NewVideoDaoInstance().QueryAuther(targetId)
 	if err != nil {
 		return nil, errors.New("用户不存在")
 	}

@@ -65,11 +65,11 @@ func (p *PublishListMessage) Do() ([]*common.VideoResponse, error) {
 }
 
 func (p PublishListMessage) check() error {
-	_, err := entity.NewUserDaoInstance().QueryById(p.userId)
-	if err != nil {
-		return err
-	}
-	_, err = entity.NewUserDaoInstance().QueryById(p.authorId)
+	//_, err := entity.NewUserDaoInstance().QueryById(p.userId)
+	//if err != nil {
+	//return err
+	//}
+	_, err := entity.NewUserDaoInstance().QueryById(p.authorId)
 	if err != nil {
 		return err
 	}
